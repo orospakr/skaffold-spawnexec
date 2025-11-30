@@ -20,7 +20,6 @@ import (
 	"bytes"
 	"context"
 	"fmt"
-	"os/exec"
 	"strings"
 
 	sErrors "github.com/GoogleContainerTools/skaffold/v2/pkg/skaffold/errors"
@@ -29,6 +28,7 @@ import (
 	"github.com/GoogleContainerTools/skaffold/v2/pkg/skaffold/schema/latest"
 	"github.com/GoogleContainerTools/skaffold/v2/pkg/skaffold/util"
 	"github.com/GoogleContainerTools/skaffold/v2/proto/v1"
+	spawnexec "github.com/orospakr/spawnexec"
 )
 
 var (
@@ -129,7 +129,7 @@ func (v *Transformer) Transform(ctx context.Context, ml manifest.ManifestList) (
 		slice := util.EnvMapToSlice(transformer.ConfigMap, "=")
 		args := []string{"fn", "eval", "-i", transformer.Image, "-o", "unwrap", "-", "--"}
 		args = append(args, slice...)
-		cmd := exec.CommandContext(ctx, "kpt", args...)
+		cmd := spawnexec.CommandContext(ctx, "kpt", args...)
 		reader := ml.Reader()
 		buffer := &bytes.Buffer{}
 		cmd.Stdin = reader
@@ -153,7 +153,7 @@ func (v *Transformer) TransformPath(path string) error {
 		kvs := util.EnvMapToSlice(transformer.ConfigMap, "=")
 		args := []string{"fn", "eval", "-i", transformer.Image, path, "--"}
 		args = append(args, kvs...)
-		command := exec.Command("kpt", args...)
+		command := spawnexec.Command("kpt", args...)
 		err := command.Run()
 		if err != nil {
 			return err

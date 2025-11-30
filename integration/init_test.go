@@ -20,13 +20,13 @@ import (
 	"errors"
 	"fmt"
 	"os"
-	"os/exec"
 	"path/filepath"
 	"strings"
 	"testing"
 
 	"github.com/GoogleContainerTools/skaffold/v2/integration/skaffold"
 	"github.com/GoogleContainerTools/skaffold/v2/testutil"
+	spawnexec "github.com/orospakr/spawnexec"
 )
 
 func TestInit(t *testing.T) {
@@ -205,7 +205,7 @@ func TestInitFailures(t *testing.T) {
 }
 
 func exitCode(err error) int {
-	var exitErr *exec.ExitError
+	var exitErr *spawnexec.ExitError
 	if ok := errors.As(err, &exitErr); ok {
 		return exitErr.ExitCode()
 	}

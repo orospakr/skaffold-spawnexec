@@ -22,9 +22,9 @@ import (
 	"fmt"
 	"io"
 	"os"
-	"os/exec"
 
 	v1 "github.com/google/go-containerregistry/pkg/v1"
+	spawnexec "github.com/orospakr/spawnexec"
 
 	"github.com/GoogleContainerTools/skaffold/v2/pkg/skaffold/docker"
 	"github.com/GoogleContainerTools/skaffold/v2/pkg/skaffold/instrumentation"
@@ -119,7 +119,7 @@ func (b *Builder) dockerCLIBuild(ctx context.Context, out io.Writer, name string
 		args = append(args, "--load")
 	}
 
-	cmd := exec.CommandContext(ctx, "docker", args...)
+	cmd := spawnexec.CommandContext(ctx, "docker", args...)
 	cmd.Env = append(util.OSEnviron(), b.localDocker.ExtraEnv()...)
 	if b.useBuildKit != nil {
 		if *b.useBuildKit {

@@ -22,7 +22,6 @@ import (
 	"fmt"
 	"io"
 	"os"
-	"os/exec"
 	"sync/atomic"
 	"time"
 
@@ -32,6 +31,7 @@ import (
 	"github.com/GoogleContainerTools/skaffold/v2/pkg/skaffold/graph"
 	"github.com/GoogleContainerTools/skaffold/v2/pkg/skaffold/output"
 	"github.com/GoogleContainerTools/skaffold/v2/proto/v1"
+	spawnexec "github.com/orospakr/spawnexec"
 )
 
 type logTailer interface {
@@ -43,7 +43,7 @@ type logTailerResource struct {
 	name      RunResourceName
 	cancel    context.CancelFunc
 	isTailing bool
-	cmd       *exec.Cmd
+	cmd       *spawnexec.Cmd
 	formatter LogFormatter
 }
 
@@ -153,7 +153,7 @@ func (r *runLogTailer) Start(ctx context.Context, out io.Writer) error {
 		for _, resource := range r.resources.resources {
 			if !resource.isTailing {
 				cctx, cancel := context.WithCancel(ctx)
-				cmd := exec.CommandContext(cctx, "gcloud", getGcloudTailArgs(resource.name)...)
+				cmd := spawnexec.CommandContext(cctx, "gcloud", getGcloudTailArgs(resource.name)...)
 				cmd.Env = os.Environ()
 				// gcloud uses buffered stream by default
 				cmd.Env = append(cmd.Env, "PYTHONUNBUFFERED=1") // gcloud defaults streaming output as buffered

@@ -20,7 +20,6 @@ import (
 	"bytes"
 	"context"
 	"fmt"
-	"os/exec"
 	"path/filepath"
 	"regexp"
 	"strings"
@@ -28,6 +27,7 @@ import (
 	"github.com/GoogleContainerTools/skaffold/v2/pkg/skaffold/output/log"
 	"github.com/GoogleContainerTools/skaffold/v2/pkg/skaffold/schema/latest"
 	"github.com/GoogleContainerTools/skaffold/v2/pkg/skaffold/util"
+	spawnexec "github.com/orospakr/spawnexec"
 )
 
 // GitCommit tags an image by the git commit it was built at.
@@ -166,7 +166,7 @@ func getGitPathToWorkdir(ctx context.Context, workingDir string) (string, error)
 }
 
 func runGit(ctx context.Context, workingDir string, arg ...string) (string, error) {
-	cmd := exec.Command("git", arg...)
+	cmd := spawnexec.Command("git", arg...)
 	cmd.Dir = workingDir
 
 	out, err := util.RunCmdOut(ctx, cmd)

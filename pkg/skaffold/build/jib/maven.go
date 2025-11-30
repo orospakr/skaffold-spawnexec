@@ -20,7 +20,8 @@ import (
 	"context"
 	"fmt"
 	"io"
-	"os/exec"
+
+	spawnexec "github.com/orospakr/spawnexec"
 
 	"github.com/GoogleContainerTools/skaffold/v2/pkg/skaffold/docker"
 	"github.com/GoogleContainerTools/skaffold/v2/pkg/skaffold/output"
@@ -87,14 +88,14 @@ func getDependenciesMaven(ctx context.Context, workspace string, a *latest.JibAr
 	return deps, nil
 }
 
-func getCommandMaven(ctx context.Context, workspace string, a *latest.JibArtifact) exec.Cmd {
+func getCommandMaven(ctx context.Context, workspace string, a *latest.JibArtifact) spawnexec.Cmd {
 	args := mavenArgsFunc(a, MinimumJibMavenVersion)
 	args = append(args, "jib:_skaffold-files-v2", "--quiet", "--batch-mode")
 
 	return MavenCommand.CreateCommand(ctx, workspace, args)
 }
 
-func getSyncMapCommandMaven(ctx context.Context, workspace string, a *latest.JibArtifact) *exec.Cmd {
+func getSyncMapCommandMaven(ctx context.Context, workspace string, a *latest.JibArtifact) *spawnexec.Cmd {
 	cmd := MavenCommand.CreateCommand(ctx, workspace, mavenBuildArgsFunc("_skaffold-sync-map", a, true, false, MinimumJibMavenVersionForSync))
 	return &cmd
 }

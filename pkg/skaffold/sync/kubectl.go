@@ -19,14 +19,14 @@ package sync
 import (
 	"context"
 	"io"
-	"os/exec"
 
 	v1 "k8s.io/api/core/v1"
 
 	"github.com/GoogleContainerTools/skaffold/v2/pkg/skaffold/util"
+	spawnexec "github.com/orospakr/spawnexec"
 )
 
-func (s *PodSyncer) deleteFileFn(ctx context.Context, pod v1.Pod, container v1.Container, files syncMap) *exec.Cmd {
+func (s *PodSyncer) deleteFileFn(ctx context.Context, pod v1.Pod, container v1.Container, files syncMap) *spawnexec.Cmd {
 	args := make([]string, 0, 9+len(files))
 	args = append(args, pod.Name, "--namespace", pod.Namespace, "-c", container.Name, "--", "rm", "-rf", "--")
 	for _, dsts := range files {
@@ -35,7 +35,7 @@ func (s *PodSyncer) deleteFileFn(ctx context.Context, pod v1.Pod, container v1.C
 	return s.kubectl.Command(ctx, "exec", args...)
 }
 
-func (s *PodSyncer) copyFileFn(ctx context.Context, pod v1.Pod, container v1.Container, files syncMap) *exec.Cmd {
+func (s *PodSyncer) copyFileFn(ctx context.Context, pod v1.Pod, container v1.Container, files syncMap) *spawnexec.Cmd {
 	// Use "m" flag to touch the files as they are copied.
 	reader, writer := io.Pipe()
 	go func() {

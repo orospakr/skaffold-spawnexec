@@ -22,7 +22,6 @@ import (
 	"fmt"
 	"io"
 	"os"
-	"os/exec"
 	"runtime"
 	"strconv"
 	"strings"
@@ -31,6 +30,7 @@ import (
 
 	"github.com/GoogleContainerTools/skaffold/v2/pkg/skaffold/constants"
 	"github.com/GoogleContainerTools/skaffold/v2/pkg/skaffold/util"
+	spawnexec "github.com/orospakr/spawnexec"
 )
 
 func IsTerminal(w io.Writer) (uintptr, bool) {
@@ -52,7 +52,7 @@ func SupportsColor(ctx context.Context) (bool, error) {
 		return true, nil
 	}
 
-	cmd := exec.Command("tput", "colors")
+	cmd := spawnexec.Command("tput", "colors")
 	res, err := util.RunCmdOut(ctx, cmd)
 	if err != nil {
 		return false, fmt.Errorf("checking terminal colors: %w", err)

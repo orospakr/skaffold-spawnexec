@@ -21,7 +21,6 @@ import (
 	"fmt"
 	"io"
 	"os"
-	"os/exec"
 	"path/filepath"
 	"strings"
 
@@ -45,6 +44,7 @@ import (
 	sUtil "github.com/GoogleContainerTools/skaffold/v2/pkg/skaffold/util"
 	"github.com/GoogleContainerTools/skaffold/v2/pkg/skaffold/util/stringset"
 	"github.com/GoogleContainerTools/skaffold/v2/proto/v1"
+	spawnexec "github.com/orospakr/spawnexec"
 )
 
 type Kustomize struct {
@@ -139,7 +139,7 @@ func (k Kustomize) render(ctx context.Context, kustomizePath string, useKubectlK
 	if useKubectlKustomize {
 		return kCLI.Kustomize(ctx, kustomizeBuildArgs(k.rCfg.Kustomize.BuildArgs, kustomizePath))
 	} else {
-		cmd := exec.CommandContext(ctx, "kustomize", append([]string{"build"}, kustomizeBuildArgs(k.rCfg.Kustomize.BuildArgs, kustomizePath)...)...)
+		cmd := spawnexec.CommandContext(ctx, "kustomize", append([]string{"build"}, kustomizeBuildArgs(k.rCfg.Kustomize.BuildArgs, kustomizePath)...)...)
 		return sUtil.RunCmdOut(ctx, cmd)
 	}
 }

@@ -20,7 +20,6 @@ import (
 	"context"
 	"fmt"
 	"os"
-	"os/exec"
 	"path/filepath"
 
 	yamlv3 "gopkg.in/yaml.v3"
@@ -30,6 +29,7 @@ import (
 	"github.com/GoogleContainerTools/skaffold/v2/pkg/skaffold/util"
 	"github.com/GoogleContainerTools/skaffold/v2/pkg/skaffold/warnings"
 	"github.com/GoogleContainerTools/skaffold/v2/pkg/skaffold/yaml"
+	spawnexec "github.com/orospakr/spawnexec"
 )
 
 // for testing
@@ -217,7 +217,7 @@ func (k kCfg) GetKubeNamespace() string {
 }
 
 func kustomizeBinary() bool {
-	_, err := exec.LookPath("kustomize")
+	_, err := spawnexec.LookPath("kustomize")
 	return err == nil
 }
 

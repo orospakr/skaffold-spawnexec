@@ -21,11 +21,12 @@ package skaffold
 
 import (
 	"context"
-	"os"
 	"testing"
+
+	spawnexec "github.com/orospakr/spawnexec"
 )
 
 // trigger stacktrace dump when skaffold process runs too long
-func waitAndTriggerStacktrace(_ context.Context, _ *testing.T, _ *os.Process) {
+func waitAndTriggerStacktrace(_ context.Context, _ *testing.T, _ *spawnexec.Process) {
 	// ignored on Windows
 }

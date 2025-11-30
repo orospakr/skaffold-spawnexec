@@ -19,10 +19,10 @@ package initializer
 import (
 	"context"
 	"os"
-	"os/exec"
 
 	"github.com/GoogleContainerTools/skaffold/v2/pkg/skaffold/output/log"
 	"github.com/GoogleContainerTools/skaffold/v2/pkg/skaffold/util"
+	spawnexec "github.com/orospakr/spawnexec"
 )
 
 // runKompose runs the `kompose` CLI before running skaffold init
@@ -32,7 +32,7 @@ func runKompose(ctx context.Context, composeFile string) error {
 	}
 
 	log.Entry(ctx).Infof("running 'kompose convert' for file %s", composeFile)
-	komposeCmd := exec.CommandContext(ctx, "kompose", "convert", "-f", composeFile)
+	komposeCmd := spawnexec.CommandContext(ctx, "kompose", "convert", "-f", composeFile)
 	_, err := util.RunCmdOut(ctx, komposeCmd)
 	return err
 }

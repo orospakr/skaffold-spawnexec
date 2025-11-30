@@ -21,10 +21,11 @@ import (
 	"errors"
 	"fmt"
 	"io"
-	"os/exec"
 	"strings"
 	"sync"
 	"testing"
+
+	spawnexec "github.com/orospakr/spawnexec"
 )
 
 type FakeCmdWithConcurrencySupport struct {
@@ -185,7 +186,7 @@ func (c *FakeCmdWithConcurrencySupport) AndRunEnv(command string, env []string) 
 	})
 }
 
-func (c *FakeCmdWithConcurrencySupport) RunCmdOut(_ context.Context, cmd *exec.Cmd) ([]byte, error) {
+func (c *FakeCmdWithConcurrencySupport) RunCmdOut(_ context.Context, cmd *spawnexec.Cmd) ([]byte, error) {
 	c.mu.Lock()
 	defer c.mu.Unlock()
 	c.timesCalled++
@@ -210,7 +211,7 @@ func (c *FakeCmdWithConcurrencySupport) RunCmdOut(_ context.Context, cmd *exec.C
 	return r.output, r.err
 }
 
-func (c *FakeCmdWithConcurrencySupport) RunCmdOutOnce(_ context.Context, cmd *exec.Cmd) ([]byte, error) {
+func (c *FakeCmdWithConcurrencySupport) RunCmdOutOnce(_ context.Context, cmd *spawnexec.Cmd) ([]byte, error) {
 	c.mu.Lock()
 	defer c.mu.Unlock()
 	c.timesCalled++
@@ -224,7 +225,7 @@ func (c *FakeCmdWithConcurrencySupport) RunCmdOutOnce(_ context.Context, cmd *ex
 	return r.output, r.err
 }
 
-func (c *FakeCmdWithConcurrencySupport) RunCmd(_ context.Context, cmd *exec.Cmd) error {
+func (c *FakeCmdWithConcurrencySupport) RunCmd(_ context.Context, cmd *spawnexec.Cmd) error {
 	c.mu.Lock()
 	defer c.mu.Unlock()
 
@@ -253,7 +254,7 @@ func (c *FakeCmdWithConcurrencySupport) RunCmd(_ context.Context, cmd *exec.Cmd)
 	return r.err
 }
 
-func (c *FakeCmdWithConcurrencySupport) assertInput(cmd *exec.Cmd, r *run, command string) error {
+func (c *FakeCmdWithConcurrencySupport) assertInput(cmd *spawnexec.Cmd, r *run, command string) error {
 	if r.input == nil {
 		return nil
 	}

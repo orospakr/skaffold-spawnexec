@@ -21,9 +21,10 @@ import (
 	"errors"
 	"fmt"
 	"io"
-	"os/exec"
 	"strings"
 	"testing"
+
+	spawnexec "github.com/orospakr/spawnexec"
 )
 
 type FakeCmd struct {
@@ -185,7 +186,7 @@ func (c *FakeCmd) AndRunEnv(command string, env []string) *FakeCmd {
 	})
 }
 
-func (c *FakeCmd) RunCmdOut(_ context.Context, cmd *exec.Cmd) ([]byte, error) {
+func (c *FakeCmd) RunCmdOut(_ context.Context, cmd *spawnexec.Cmd) ([]byte, error) {
 	c.timesCalled++
 	command := strings.Join(cmd.Args, " ")
 
@@ -212,7 +213,7 @@ func (c *FakeCmd) RunCmdOut(_ context.Context, cmd *exec.Cmd) ([]byte, error) {
 	return r.output, r.err
 }
 
-func (c *FakeCmd) RunCmdOutOnce(_ context.Context, cmd *exec.Cmd) ([]byte, error) {
+func (c *FakeCmd) RunCmdOutOnce(_ context.Context, cmd *spawnexec.Cmd) ([]byte, error) {
 	c.timesCalled++
 	command := strings.Join(cmd.Args, " ")
 
@@ -224,7 +225,7 @@ func (c *FakeCmd) RunCmdOutOnce(_ context.Context, cmd *exec.Cmd) ([]byte, error
 	return r.output, r.err
 }
 
-func (c *FakeCmd) RunCmd(_ context.Context, cmd *exec.Cmd) error {
+func (c *FakeCmd) RunCmd(_ context.Context, cmd *spawnexec.Cmd) error {
 	c.timesCalled++
 	command := strings.Join(cmd.Args, " ")
 
@@ -254,7 +255,7 @@ func (c *FakeCmd) RunCmd(_ context.Context, cmd *exec.Cmd) error {
 	return r.err
 }
 
-func (c *FakeCmd) assertInput(cmd *exec.Cmd, r *run, command string) error {
+func (c *FakeCmd) assertInput(cmd *spawnexec.Cmd, r *run, command string) error {
 	if r.input == nil {
 		return nil
 	}

@@ -21,7 +21,6 @@ import (
 	"errors"
 	"fmt"
 	"io"
-	"os/exec"
 	"path"
 	"path/filepath"
 	"strings"
@@ -43,6 +42,7 @@ import (
 	"github.com/GoogleContainerTools/skaffold/v2/pkg/skaffold/output/log"
 	"github.com/GoogleContainerTools/skaffold/v2/pkg/skaffold/schema/latest"
 	"github.com/GoogleContainerTools/skaffold/v2/pkg/skaffold/util"
+	spawnexec "github.com/orospakr/spawnexec"
 )
 
 // For testing
@@ -323,7 +323,7 @@ func (s *PodSyncer) sync(ctx context.Context, item *Item) error {
 	return nil
 }
 
-func Perform(ctx context.Context, image string, files syncMap, cmdFn func(context.Context, v1.Pod, v1.Container, syncMap) *exec.Cmd, namespaces []string, kubeContext string) error {
+func Perform(ctx context.Context, image string, files syncMap, cmdFn func(context.Context, v1.Pod, v1.Container, syncMap) *spawnexec.Cmd, namespaces []string, kubeContext string) error {
 	if len(files) == 0 {
 		return nil
 	}

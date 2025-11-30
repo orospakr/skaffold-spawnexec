@@ -20,9 +20,10 @@ import (
 	"context"
 	"fmt"
 	"io"
-	"os/exec"
 	"path/filepath"
 	"runtime"
+
+	spawnexec "github.com/orospakr/spawnexec"
 
 	"github.com/GoogleContainerTools/skaffold/v2/pkg/skaffold/build/misc"
 	"github.com/GoogleContainerTools/skaffold/v2/pkg/skaffold/constants"
@@ -52,7 +53,7 @@ func (b *Builder) runBuildScript(ctx context.Context, out io.Writer, a *latest.A
 	return misc.HandleGracefulTermination(ctx, cmd)
 }
 
-func (b *Builder) retrieveCmd(ctx context.Context, out io.Writer, a *latest.Artifact, tag string, platforms platform.Matcher) (*exec.Cmd, error) {
+func (b *Builder) retrieveCmd(ctx context.Context, out io.Writer, a *latest.Artifact, tag string, platforms platform.Matcher) (*spawnexec.Cmd, error) {
 	artifact := a.CustomArtifact
 
 	// Expand command
@@ -61,13 +62,13 @@ func (b *Builder) retrieveCmd(ctx context.Context, out io.Writer, a *latest.Arti
 		return nil, fmt.Errorf("unable to parse build command %q: %w", artifact.BuildCommand, err)
 	}
 
-	var cmd *exec.Cmd
+	var cmd *spawnexec.Cmd
 	// We evaluate the command with a shell so that it can contain
 	// env variables.
 	if runtime.GOOS == "windows" {
-		cmd = exec.CommandContext(ctx, "cmd.exe", "/C", command)
+		cmd = spawnexec.CommandContext(ctx, "cmd.exe", "/C", command)
 	} else {
-		cmd = exec.CommandContext(ctx, "sh", "-c", command)
+		cmd = spawnexec.CommandContext(ctx, "sh", "-c", command)
 	}
 	cmd.Stdout = out
 	cmd.Stderr = out

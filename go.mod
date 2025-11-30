@@ -81,6 +81,7 @@ require (
 	github.com/moby/patternmatcher v0.6.0
 	github.com/opencontainers/go-digest v1.0.0
 	github.com/opencontainers/image-spec v1.1.1
+	github.com/orospakr/spawnexec v0.0.0-20251130172638-e5a3afb485df
 	github.com/otiai10/copy v1.14.1
 	github.com/pkg/errors v0.9.1
 	github.com/rjeczalik/notify v0.9.3

@@ -19,7 +19,6 @@ package custom
 import (
 	"context"
 	"io"
-	"os/exec"
 	"runtime"
 	"testing"
 
@@ -29,6 +28,7 @@ import (
 	"github.com/GoogleContainerTools/skaffold/v2/pkg/skaffold/schema/latest"
 	"github.com/GoogleContainerTools/skaffold/v2/pkg/skaffold/util"
 	"github.com/GoogleContainerTools/skaffold/v2/testutil"
+	spawnexec "github.com/orospakr/spawnexec"
 )
 
 func TestRetrieveEnv(t *testing.T) {
@@ -95,8 +95,8 @@ func TestRetrieveCmd(t *testing.T) {
 		artifact          *latest.Artifact
 		tag               string
 		env               []string
-		expected          *exec.Cmd
-		expectedOnWindows *exec.Cmd
+		expected          *spawnexec.Cmd
+		expectedOnWindows *spawnexec.Cmd
 	}{
 		{
 			description: "artifact with workspace set",
@@ -162,8 +162,8 @@ func TestRetrieveCmd(t *testing.T) {
 	}
 }
 
-func expectedCmd(dir, buildCommand string, args, env []string) *exec.Cmd {
-	cmd := exec.Command(buildCommand, args...)
+func expectedCmd(dir, buildCommand string, args, env []string) *spawnexec.Cmd {
+	cmd := spawnexec.Command(buildCommand, args...)
 	cmd.Dir = dir
 	cmd.Env = env
 	return cmd

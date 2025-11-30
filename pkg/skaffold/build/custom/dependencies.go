@@ -20,8 +20,9 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
-	"os/exec"
 	"strings"
+
+	spawnexec "github.com/orospakr/spawnexec"
 
 	"github.com/GoogleContainerTools/skaffold/v2/pkg/skaffold/build/list"
 	"github.com/GoogleContainerTools/skaffold/v2/pkg/skaffold/docker"
@@ -37,7 +38,7 @@ func GetDependencies(ctx context.Context, workspace string, artifactName string,
 
 	case a.Dependencies.Command != "":
 		split := strings.Split(a.Dependencies.Command, " ")
-		cmd := exec.CommandContext(ctx, split[0], split[1:]...)
+		cmd := spawnexec.CommandContext(ctx, split[0], split[1:]...)
 		cmd.Dir = workspace
 		output, err := util.RunCmdOut(ctx, cmd)
 		if err != nil {

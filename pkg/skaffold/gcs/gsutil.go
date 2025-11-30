@@ -24,7 +24,6 @@ import (
 	"errors"
 	"fmt"
 	"os"
-	"os/exec"
 	"path/filepath"
 
 	"github.com/GoogleContainerTools/skaffold/v2/pkg/skaffold/config"
@@ -34,6 +33,7 @@ import (
 	"github.com/GoogleContainerTools/skaffold/v2/pkg/skaffold/schema/latest"
 	"github.com/GoogleContainerTools/skaffold/v2/pkg/skaffold/util"
 	"github.com/GoogleContainerTools/skaffold/v2/proto/v1"
+	spawnexec "github.com/orospakr/spawnexec"
 )
 
 const GsutilExec = "gsutil"
@@ -56,7 +56,7 @@ func (g *gsutil) Copy(ctx context.Context, src, dst string, recursive bool) erro
 		args = append(args, "-r")
 	}
 	args = append(args, src, dst)
-	cmd := exec.CommandContext(ctx, GsutilExec, args...)
+	cmd := spawnexec.CommandContext(ctx, GsutilExec, args...)
 	out, err := util.RunCmdOut(ctx, cmd)
 	if err != nil {
 		return fmt.Errorf("copy file(s) with %s failed: %w", GsutilExec, err)

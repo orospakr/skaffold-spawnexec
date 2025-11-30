@@ -21,7 +21,6 @@ import (
 	"fmt"
 	"io"
 	"os"
-	"os/exec"
 
 	v1 "github.com/google/go-containerregistry/pkg/v1"
 
@@ -30,6 +29,7 @@ import (
 	"github.com/GoogleContainerTools/skaffold/v2/pkg/skaffold/output/log"
 	"github.com/GoogleContainerTools/skaffold/v2/pkg/skaffold/schema/latest"
 	"github.com/GoogleContainerTools/skaffold/v2/pkg/skaffold/util"
+	spawnexec "github.com/orospakr/spawnexec"
 )
 
 type Runner struct {
@@ -90,7 +90,7 @@ func (cst *Runner) runStructureTests(ctx context.Context, out io.Writer, imageTa
 		args = append(args, "--config", f)
 	}
 	args = append(args, cst.structureTestArgs...)
-	cmd := exec.CommandContext(ctx, "container-structure-test", args...)
+	cmd := spawnexec.CommandContext(ctx, "container-structure-test", args...)
 	cmd.Stdout = out
 	cmd.Stderr = out
 	cmd.Env = cst.env()

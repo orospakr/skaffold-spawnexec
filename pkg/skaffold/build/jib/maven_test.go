@@ -22,7 +22,6 @@ import (
 	"fmt"
 	"io"
 	"os"
-	"os/exec"
 	"strings"
 	"testing"
 	"time"
@@ -35,6 +34,7 @@ import (
 	"github.com/GoogleContainerTools/skaffold/v2/pkg/skaffold/schema/latest"
 	"github.com/GoogleContainerTools/skaffold/v2/pkg/skaffold/util"
 	"github.com/GoogleContainerTools/skaffold/v2/testutil"
+	spawnexec "github.com/orospakr/spawnexec"
 )
 
 func TestBuildJibMavenToDocker(t *testing.T) {
@@ -250,13 +250,13 @@ func TestGetCommandMaven(t *testing.T) {
 		description      string
 		jibArtifact      latest.JibArtifact
 		filesInWorkspace []string
-		expectedCmd      func(workspace string) exec.Cmd
+		expectedCmd      func(workspace string) spawnexec.Cmd
 	}{
 		{
 			description:      "maven basic",
 			jibArtifact:      latest.JibArtifact{},
 			filesInWorkspace: []string{},
-			expectedCmd: func(workspace string) exec.Cmd {
+			expectedCmd: func(workspace string) spawnexec.Cmd {
 				return MavenCommand.CreateCommand(ctx, workspace, []string{"fake-mavenArgs", "jib:_skaffold-files-v2", "--quiet", "--batch-mode"})
 			},
 		},
@@ -264,7 +264,7 @@ func TestGetCommandMaven(t *testing.T) {
 			description:      "maven with wrapper",
 			jibArtifact:      latest.JibArtifact{},
 			filesInWorkspace: []string{"mvnw", "mvnw.bat"},
-			expectedCmd: func(workspace string) exec.Cmd {
+			expectedCmd: func(workspace string) spawnexec.Cmd {
 				return MavenCommand.CreateCommand(ctx, workspace, []string{"fake-mavenArgs", "jib:_skaffold-files-v2", "--quiet", "--batch-mode"})
 			},
 		},
@@ -272,7 +272,7 @@ func TestGetCommandMaven(t *testing.T) {
 			description:      "maven with multi-modules",
 			jibArtifact:      latest.JibArtifact{Project: "module"},
 			filesInWorkspace: []string{"mvnw", "mvnw.bat"},
-			expectedCmd: func(workspace string) exec.Cmd {
+			expectedCmd: func(workspace string) spawnexec.Cmd {
 				return MavenCommand.CreateCommand(ctx, workspace, []string{"fake-mavenArgs-for-module", "jib:_skaffold-files-v2", "--quiet", "--batch-mode"})
 			},
 		},
@@ -299,19 +299,19 @@ func TestGetSyncMapCommandMaven(t *testing.T) {
 		description string
 		workspace   string
 		jibArtifact latest.JibArtifact
-		expectedCmd func(workspace string) exec.Cmd
+		expectedCmd func(workspace string) spawnexec.Cmd
 	}{
 		{
 			description: "single module",
 			jibArtifact: latest.JibArtifact{},
-			expectedCmd: func(workspace string) exec.Cmd {
+			expectedCmd: func(workspace string) spawnexec.Cmd {
 				return MavenCommand.CreateCommand(ctx, workspace, []string{"fake-mavenBuildArgs-for-_skaffold-sync-map-skipTests"})
 			},
 		},
 		{
 			description: "multi module",
 			jibArtifact: latest.JibArtifact{Project: "module"},
-			expectedCmd: func(workspace string) exec.Cmd {
+			expectedCmd: func(workspace string) spawnexec.Cmd {
 				return MavenCommand.CreateCommand(ctx, workspace, []string{"fake-mavenBuildArgs-for-module-for-_skaffold-sync-map-skipTests"})
 			},
 		},

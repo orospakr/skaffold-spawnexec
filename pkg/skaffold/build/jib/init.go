@@ -22,10 +22,11 @@ import (
 	"encoding/json"
 	"fmt"
 	"os"
-	"os/exec"
 	"path/filepath"
 	"regexp"
 	"strings"
+
+	spawnexec "github.com/orospakr/spawnexec"
 
 	"github.com/GoogleContainerTools/skaffold/v2/pkg/skaffold/output/log"
 	"github.com/GoogleContainerTools/skaffold/v2/pkg/skaffold/schema/latest"
@@ -121,7 +122,7 @@ func validate(ctx context.Context, path string, enableGradleAnalysis bool) []Art
 	if wrapperExecutable, err := util.AbsFile(filepath.Dir(path), wrapper); err == nil {
 		executable = wrapperExecutable
 	}
-	cmd := exec.Command(executable, taskName, "-q", consoleFlag)
+	cmd := spawnexec.Command(executable, taskName, "-q", consoleFlag)
 	cmd.Dir = filepath.Dir(path)
 	stdout, err := util.RunCmdOut(ctx, cmd)
 	if err != nil {

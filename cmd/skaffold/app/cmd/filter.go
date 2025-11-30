@@ -21,7 +21,6 @@ import (
 	"fmt"
 	"io"
 	"os"
-	"os/exec"
 
 	"github.com/spf13/cobra"
 	apim "k8s.io/apimachinery/pkg/runtime/schema"
@@ -38,6 +37,7 @@ import (
 	"github.com/GoogleContainerTools/skaffold/v2/pkg/skaffold/schema/latest"
 	"github.com/GoogleContainerTools/skaffold/v2/pkg/skaffold/schema/util"
 	pkgutil "github.com/GoogleContainerTools/skaffold/v2/pkg/skaffold/util"
+	spawnexec "github.com/orospakr/spawnexec"
 )
 
 // for tests
@@ -71,7 +71,7 @@ func runFilter(ctx context.Context, out io.Writer, debuggingFilters bool, postRe
 		var manifestList manifest.ManifestList
 		var err error
 		if postRenderer != "" {
-			cmd := exec.CommandContext(ctx, postRenderer)
+			cmd := spawnexec.CommandContext(ctx, postRenderer)
 			cmd.Stdin = os.Stdin
 			stdoutPipe, err := cmd.StdoutPipe()
 			if err != nil {

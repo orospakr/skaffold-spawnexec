@@ -1271,6 +1271,9 @@ github.com/opencontainers/image-spec/specs-go/v1
 github.com/opencontainers/selinux/go-selinux
 github.com/opencontainers/selinux/go-selinux/label
 github.com/opencontainers/selinux/pkg/pwalkdir
+# github.com/orospakr/spawnexec v0.0.0-20251130172638-e5a3afb485df
+## explicit; go 1.25.2
+github.com/orospakr/spawnexec
 # github.com/otiai10/copy v1.14.1
 ## explicit; go 1.18
 github.com/otiai10/copy

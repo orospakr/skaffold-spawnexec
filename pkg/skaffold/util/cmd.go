@@ -20,9 +20,9 @@ import (
 	"bytes"
 	"context"
 	"fmt"
-	"os/exec"
 
 	"github.com/GoogleContainerTools/skaffold/v2/pkg/skaffold/output/log"
+	spawnexec "github.com/orospakr/spawnexec"
 )
 
 type cmdError struct {
@@ -41,7 +41,7 @@ func (e *cmdError) Unwrap() error {
 }
 
 func (e *cmdError) ExitCode() int {
-	if exitError, ok := e.cause.(*exec.ExitError); ok {
+	if exitError, ok := e.cause.(*spawnexec.ExitError); ok {
 		return exitError.ExitCode()
 	}
 	return 0
@@ -57,41 +57,41 @@ func newCommander() *Commander {
 }
 
 // Command is an interface used to run commands. All packages should use this
-// interface instead of calling exec.Cmd directly.
+// interface instead of calling spawnexec.Cmd directly.
 type Command interface {
-	RunCmdOut(ctx context.Context, cmd *exec.Cmd) ([]byte, error)
-	RunCmd(ctx context.Context, cmd *exec.Cmd) error
-	RunCmdOutOnce(ctx context.Context, cmd *exec.Cmd) ([]byte, error)
+	RunCmdOut(ctx context.Context, cmd *spawnexec.Cmd) ([]byte, error)
+	RunCmd(ctx context.Context, cmd *spawnexec.Cmd) error
+	RunCmdOutOnce(ctx context.Context, cmd *spawnexec.Cmd) ([]byte, error)
 }
 
-func RunCmdOut(ctx context.Context, cmd *exec.Cmd) ([]byte, error) {
+func RunCmdOut(ctx context.Context, cmd *spawnexec.Cmd) ([]byte, error) {
 	if DefaultExecCommand == nil {
 		return nil, fmt.Errorf("test didn't set DefaultExecCommand to any commands, but got run: %q", cmd)
 	}
 	return DefaultExecCommand.RunCmdOut(ctx, cmd)
 }
 
-func RunCmd(ctx context.Context, cmd *exec.Cmd) error {
+func RunCmd(ctx context.Context, cmd *spawnexec.Cmd) error {
 	if DefaultExecCommand == nil {
 		return fmt.Errorf("test didn't set DefaultExecCommand to any commands, but got run: %q", cmd)
 	}
 	return DefaultExecCommand.RunCmd(ctx, cmd)
 }
 
-func RunCmdOutOnce(ctx context.Context, cmd *exec.Cmd) ([]byte, error) {
+func RunCmdOutOnce(ctx context.Context, cmd *spawnexec.Cmd) ([]byte, error) {
 	if DefaultExecCommand == nil {
 		return nil, fmt.Errorf("test didn't set DefaultExecCommand to any commands, but got run: %q", cmd)
 	}
 	return DefaultExecCommand.RunCmdOutOnce(ctx, cmd)
 }
 
-// Commander is the exec.Cmd implementation of the Command interface
+// Commander is the spawnexec.Cmd implementation of the Command interface
 type Commander struct {
 	store *SyncStore[[]byte]
 }
 
-// RunCmdOut runs an exec.Command and returns the stdout and error.
-func (*Commander) RunCmdOut(ctx context.Context, cmd *exec.Cmd) ([]byte, error) {
+// RunCmdOut runs an spawnexec.Command and returns the stdout and error.
+func (*Commander) RunCmdOut(ctx context.Context, cmd *spawnexec.Cmd) ([]byte, error) {
 	log.Entry(ctx).Debugf("Running command: %s", cmd.Args)
 
 	stdout := bytes.Buffer{}
@@ -121,13 +121,13 @@ func (*Commander) RunCmdOut(ctx context.Context, cmd *exec.Cmd) ([]byte, error) 
 	return stdout.Bytes(), nil
 }
 
-// RunCmd runs an exec.Command.
-func (*Commander) RunCmd(ctx context.Context, cmd *exec.Cmd) error {
+// RunCmd runs an spawnexec.Command.
+func (*Commander) RunCmd(ctx context.Context, cmd *spawnexec.Cmd) error {
 	log.Entry(ctx).Debugf("Running command: %s", cmd.Args)
 	return cmd.Run()
 }
 
-func (c *Commander) RunCmdOutOnce(ctx context.Context, cmd *exec.Cmd) ([]byte, error) {
+func (c *Commander) RunCmdOutOnce(ctx context.Context, cmd *spawnexec.Cmd) ([]byte, error) {
 	return c.store.Exec(cmd.String(), func() ([]byte, error) {
 		return RunCmdOut(ctx, cmd)
 	})

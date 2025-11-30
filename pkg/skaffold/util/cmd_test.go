@@ -20,16 +20,16 @@ import (
 	"context"
 	"fmt"
 	"os"
-	"os/exec"
 	"testing"
 
 	"github.com/GoogleContainerTools/skaffold/v2/testutil"
+	spawnexec "github.com/orospakr/spawnexec"
 )
 
-func helperCommand(s ...string) *exec.Cmd {
+func helperCommand(s ...string) *spawnexec.Cmd {
 	cs := []string{"-test.run=TestHelperProcess", "--"}
 	cs = append(cs, s...)
-	cmd := exec.Command(os.Args[0], cs...)
+	cmd := spawnexec.Command(os.Args[0], cs...)
 	cmd.Env = []string{"GO_WANT_HELPER_PROCESS=1"}
 	return cmd
 }
@@ -72,7 +72,7 @@ func TestHelperProcess(*testing.T) {
 func TestCmd_RunCmdOut(t *testing.T) {
 	tests := []struct {
 		description string
-		cmd         *exec.Cmd
+		cmd         *spawnexec.Cmd
 		want        string
 		shouldErr   bool
 	}{

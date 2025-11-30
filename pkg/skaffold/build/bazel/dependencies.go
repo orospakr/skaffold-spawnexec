@@ -20,11 +20,12 @@ import (
 	"context"
 	"fmt"
 	"os"
-	"os/exec"
 	"path/filepath"
 	"strings"
 	"sync"
 	"time"
+
+	spawnexec "github.com/orospakr/spawnexec"
 
 	"github.com/GoogleContainerTools/skaffold/v2/pkg/skaffold/output/log"
 	"github.com/GoogleContainerTools/skaffold/v2/pkg/skaffold/schema/latest"
@@ -66,7 +67,7 @@ func GetDependencies(ctx context.Context, dir string, a *latest.BazelArtifact) (
 		return nil, fmt.Errorf("unable to find the WORKSPACE file: %w", err)
 	}
 
-	cmd := exec.CommandContext(ctx, "bazel", "query", query(a.BuildTarget), "--noimplicit_deps", "--order_output=no", "--output=label")
+	cmd := spawnexec.CommandContext(ctx, "bazel", "query", query(a.BuildTarget), "--noimplicit_deps", "--order_output=no", "--output=label")
 	cmd.Dir = dir
 	stdout, err := util.RunCmdOut(ctx, cmd)
 	if err != nil {
@@ -112,7 +113,7 @@ func depToPath(dep string) string {
 }
 
 func findWorkspace(ctx context.Context, workingDir string) (string, []string, error) {
-	cmd := exec.CommandContext(ctx, "bazel", "info", "workspace")
+	cmd := spawnexec.CommandContext(ctx, "bazel", "info", "workspace")
 	cmd.Dir = workingDir
 	dirBytes, err := util.RunCmdOut(ctx, cmd)
 	if err != nil {

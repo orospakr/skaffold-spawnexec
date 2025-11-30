@@ -21,7 +21,6 @@ import (
 	"context"
 	"fmt"
 	"os"
-	"os/exec"
 	"sort"
 	"strings"
 	"text/template"
@@ -29,6 +28,7 @@ import (
 	"github.com/Masterminds/sprig"
 
 	"github.com/GoogleContainerTools/skaffold/v2/pkg/skaffold/output/log"
+	spawnexec "github.com/orospakr/spawnexec"
 )
 
 // For testing
@@ -140,7 +140,7 @@ func MapToFlag(m map[string]*string, flag string) ([]string, error) {
 }
 
 func runCmdFunc(name string, args ...string) (string, error) {
-	cmd := exec.Command(name, args...)
+	cmd := spawnexec.Command(name, args...)
 	out, err := RunCmdOut(context.TODO(), cmd)
 	return strings.TrimSpace(string(out)), err
 }

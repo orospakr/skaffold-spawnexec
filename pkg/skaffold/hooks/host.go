@@ -20,7 +20,6 @@ import (
 	"context"
 	"fmt"
 	"io"
-	"os/exec"
 	"runtime"
 	"strings"
 
@@ -29,6 +28,7 @@ import (
 	"github.com/GoogleContainerTools/skaffold/v2/pkg/skaffold/schema/latest"
 	"github.com/GoogleContainerTools/skaffold/v2/pkg/skaffold/util"
 	"github.com/GoogleContainerTools/skaffold/v2/pkg/skaffold/util/stringslice"
+	spawnexec "github.com/orospakr/spawnexec"
 )
 
 // hostHook represents a lifecycle hook to be executed on the host machine
@@ -58,8 +58,8 @@ func (h hostHook) run(ctx context.Context, in io.Reader, out io.Writer) error {
 	return misc.HandleGracefulTermination(ctx, cmd)
 }
 
-func (h hostHook) retrieveCmd(ctx context.Context, in io.Reader, out io.Writer) *exec.Cmd {
-	cmd := exec.CommandContext(ctx, h.cfg.Command[0], h.cfg.Command[1:]...)
+func (h hostHook) retrieveCmd(ctx context.Context, in io.Reader, out io.Writer) *spawnexec.Cmd {
+	cmd := spawnexec.CommandContext(ctx, h.cfg.Command[0], h.cfg.Command[1:]...)
 	if in != nil {
 		cmd.Stdin = in
 	}

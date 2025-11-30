@@ -19,10 +19,11 @@ package misc
 import (
 	"context"
 	"os"
-	"os/exec"
 	"runtime"
 	"sync"
 	"time"
+
+	spawnexec "github.com/orospakr/spawnexec"
 
 	"github.com/GoogleContainerTools/skaffold/v2/pkg/skaffold/output/log"
 )
@@ -32,7 +33,7 @@ var (
 	gracePeriod = 2 * time.Second
 )
 
-func HandleGracefulTermination(ctx context.Context, cmd *exec.Cmd) error {
+func HandleGracefulTermination(ctx context.Context, cmd *spawnexec.Cmd) error {
 	done := make(chan bool, 1) // Non blocking
 	defer close(done)
 

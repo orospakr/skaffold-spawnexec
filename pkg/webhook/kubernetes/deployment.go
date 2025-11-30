@@ -21,7 +21,6 @@ import (
 	"fmt"
 	"log"
 	"net/http"
-	"os/exec"
 	"path"
 	"time"
 
@@ -35,6 +34,7 @@ import (
 	kubernetesclient "github.com/GoogleContainerTools/skaffold/v2/pkg/skaffold/kubernetes/client"
 	"github.com/GoogleContainerTools/skaffold/v2/pkg/webhook/constants"
 	"github.com/GoogleContainerTools/skaffold/v2/pkg/webhook/labels"
+	spawnexec "github.com/orospakr/spawnexec"
 )
 
 const (
@@ -157,13 +157,13 @@ func BaseURL(ip string) string {
 func Logs(d *appsv1.Deployment) string {
 	deploy := fmt.Sprintf("deployment/%s", d.Name)
 	// get init container logs
-	cmd := exec.Command("kubectl", "logs", deploy, "-c", initContainerName)
+	cmd := spawnexec.Command("kubectl", "logs", deploy, "-c", initContainerName)
 	initLogs, err := cmd.CombinedOutput()
 	if err != nil {
 		log.Printf("Error retrieving init container logs for %s: %v", d.Name, err)
 	}
 	// get deployment logs
-	cmd = exec.Command("kubectl", "logs", deploy)
+	cmd = spawnexec.Command("kubectl", "logs", deploy)
 	logs, err := cmd.CombinedOutput()
 	if err != nil {
 		log.Printf("Error retrieving deployment logs for %s: %v", d.Name, err)

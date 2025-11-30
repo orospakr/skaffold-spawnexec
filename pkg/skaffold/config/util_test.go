@@ -19,7 +19,6 @@ package config
 import (
 	"context"
 	"fmt"
-	"os/exec"
 	"path/filepath"
 	"strings"
 	"testing"
@@ -36,6 +35,7 @@ import (
 	"github.com/GoogleContainerTools/skaffold/v2/pkg/skaffold/util"
 	"github.com/GoogleContainerTools/skaffold/v2/pkg/skaffold/yaml"
 	"github.com/GoogleContainerTools/skaffold/v2/testutil"
+	spawnexec "github.com/orospakr/spawnexec"
 )
 
 func TestReadConfig(t *testing.T) {
@@ -286,7 +286,7 @@ type fakeClient struct{}
 func (fakeClient) IsMinikube(ctx context.Context, kubeContext string) bool {
 	return kubeContext == "minikube"
 }
-func (fakeClient) MinikubeExec(context.Context, ...string) (*exec.Cmd, error) { return nil, nil }
+func (fakeClient) MinikubeExec(context.Context, ...string) (*spawnexec.Cmd, error) { return nil, nil }
 
 func TestGetCluster(t *testing.T) {
 	var defaultRepo = "localhost:4000"

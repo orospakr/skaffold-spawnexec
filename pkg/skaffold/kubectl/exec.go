@@ -21,17 +21,17 @@ package kubectl
 
 import (
 	"context"
-	"os/exec"
+	spawnexec "github.com/orospakr/spawnexec"
 )
 
-// Cmd is a wrapper on exec.Cmd
+// Cmd is a wrapper on spawnexec.Cmd
 type Cmd struct {
-	*exec.Cmd
+	*spawnexec.Cmd
 }
 
 // CommandContext creates a new Cmd
 func CommandContext(ctx context.Context, name string, arg ...string) *Cmd {
-	return &Cmd{Cmd: exec.CommandContext(ctx, name, arg...)}
+	return &Cmd{Cmd: spawnexec.CommandContext(ctx, name, arg...)}
 }
 
 // Terminate kills the underlying process

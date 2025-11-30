@@ -21,14 +21,15 @@ package skaffold
 
 import (
 	"context"
-	"os"
 	"syscall"
 	"testing"
 	"time"
+
+	spawnexec "github.com/orospakr/spawnexec"
 )
 
 // trigger stacktrace dump when skaffold process runs too long
-func waitAndTriggerStacktrace(ctx context.Context, t *testing.T, process *os.Process) {
+func waitAndTriggerStacktrace(ctx context.Context, t *testing.T, process *spawnexec.Process) {
 	go func() {
 		var d = 2 * time.Minute
 		select {

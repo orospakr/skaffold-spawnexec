@@ -23,7 +23,6 @@ import (
 	"fmt"
 	"net/url"
 	"os"
-	"os/exec"
 	"path/filepath"
 	"sync"
 
@@ -35,6 +34,7 @@ import (
 	"github.com/GoogleContainerTools/skaffold/v2/pkg/skaffold/output/log"
 	"github.com/GoogleContainerTools/skaffold/v2/pkg/skaffold/util"
 	"github.com/GoogleContainerTools/skaffold/v2/pkg/skaffold/version"
+	spawnexec "github.com/orospakr/spawnexec"
 )
 
 var (
@@ -60,7 +60,7 @@ type Client interface {
 	// IsMinikube returns true if the given kubeContext maps to a minikube cluster
 	IsMinikube(ctx context.Context, kubeContext string) bool
 	// MinikubeExec returns the Cmd struct to execute minikube with given arguments
-	MinikubeExec(ctx context.Context, arg ...string) (*exec.Cmd, error)
+	MinikubeExec(ctx context.Context, arg ...string) (*spawnexec.Cmd, error)
 }
 
 type clientImpl struct{}
@@ -99,18 +99,18 @@ func (clientImpl) IsMinikube(ctx context.Context, kubeContext string) bool {
 	return false
 }
 
-func (clientImpl) MinikubeExec(ctx context.Context, arg ...string) (*exec.Cmd, error) {
+func (clientImpl) MinikubeExec(ctx context.Context, arg ...string) (*spawnexec.Cmd, error) {
 	return minikubeExec(ctx, arg...)
 }
 
-func minikubeExec(ctx context.Context, arg ...string) (*exec.Cmd, error) {
+func minikubeExec(ctx context.Context, arg ...string) (*spawnexec.Cmd, error) {
 	b, v, err := FindMinikubeBinary(ctx)
 	if err != nil && !errors.As(err, &versionErr{}) {
 		return nil, fmt.Errorf("getting minikube executable: %w", err)
 	} else if err == nil && supportsUserFlag(v) {
 		arg = append(arg, "--user=skaffold")
 	}
-	return exec.Command(b, arg...), nil
+	return spawnexec.Command(b, arg...), nil
 }
 
 func supportsUserFlag(ver semver.Version) bool {
@@ -119,7 +119,7 @@ func supportsUserFlag(ver semver.Version) bool {
 
 // Retrieves minikube version
 func getCurrentVersion(ctx context.Context) (semver.Version, error) {
-	cmd := exec.Command("minikube", "version", "--output=json")
+	cmd := spawnexec.Command("minikube", "version", "--output=json")
 	out, err := util.RunCmdOut(ctx, cmd)
 	if err != nil {
 		return semver.Version{}, err
@@ -138,7 +138,7 @@ func getCurrentVersion(ctx context.Context) (semver.Version, error) {
 
 func minikubeBinary(ctx context.Context) (string, semver.Version, error) {
 	findOnce.Do(func() {
-		filename, err := exec.LookPath("minikube")
+		filename, err := spawnexec.LookPath("minikube")
 		if err != nil {
 			mk.err = errors.New("unable to lookup minikube executable. Please add it to PATH environment variable")
 		}

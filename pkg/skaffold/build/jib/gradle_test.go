@@ -22,7 +22,6 @@ import (
 	"fmt"
 	"io"
 	"os"
-	"os/exec"
 	"strings"
 	"testing"
 	"time"
@@ -35,6 +34,7 @@ import (
 	"github.com/GoogleContainerTools/skaffold/v2/pkg/skaffold/schema/latest"
 	"github.com/GoogleContainerTools/skaffold/v2/pkg/skaffold/util"
 	"github.com/GoogleContainerTools/skaffold/v2/testutil"
+	spawnexec "github.com/orospakr/spawnexec"
 )
 
 func TestBuildJibGradleToDocker(t *testing.T) {
@@ -258,13 +258,13 @@ func TestGetCommandGradle(t *testing.T) {
 		description      string
 		jibArtifact      latest.JibArtifact
 		filesInWorkspace []string
-		expectedCmd      func(workspace string) exec.Cmd
+		expectedCmd      func(workspace string) spawnexec.Cmd
 	}{
 		{
 			description:      "gradle default",
 			jibArtifact:      latest.JibArtifact{},
 			filesInWorkspace: []string{},
-			expectedCmd: func(workspace string) exec.Cmd {
+			expectedCmd: func(workspace string) spawnexec.Cmd {
 				return GradleCommand.CreateCommand(ctx, workspace, []string{"_skaffoldFailIfJibOutOfDate", "-Djib.requiredVersion=" + MinimumJibGradleVersion, ":_jibSkaffoldFilesV2", "-q", "--console=plain"})
 			},
 		},
@@ -272,7 +272,7 @@ func TestGetCommandGradle(t *testing.T) {
 			description:      "gradle default with project",
 			jibArtifact:      latest.JibArtifact{Project: "project"},
 			filesInWorkspace: []string{},
-			expectedCmd: func(workspace string) exec.Cmd {
+			expectedCmd: func(workspace string) spawnexec.Cmd {
 				return GradleCommand.CreateCommand(ctx, workspace, []string{"_skaffoldFailIfJibOutOfDate", "-Djib.requiredVersion=" + MinimumJibGradleVersion, ":project:_jibSkaffoldFilesV2", "-q", "--console=plain"})
 			},
 		},
@@ -280,7 +280,7 @@ func TestGetCommandGradle(t *testing.T) {
 			description:      "gradle with wrapper",
 			jibArtifact:      latest.JibArtifact{},
 			filesInWorkspace: []string{"gradlew", "gradlew.cmd"},
-			expectedCmd: func(workspace string) exec.Cmd {
+			expectedCmd: func(workspace string) spawnexec.Cmd {
 				return GradleCommand.CreateCommand(ctx, workspace, []string{"_skaffoldFailIfJibOutOfDate", "-Djib.requiredVersion=" + MinimumJibGradleVersion, ":_jibSkaffoldFilesV2", "-q", "--console=plain"})
 			},
 		},
@@ -288,7 +288,7 @@ func TestGetCommandGradle(t *testing.T) {
 			description:      "gradle with wrapper and project",
 			jibArtifact:      latest.JibArtifact{Project: "project"},
 			filesInWorkspace: []string{"gradlew", "gradlew.cmd"},
-			expectedCmd: func(workspace string) exec.Cmd {
+			expectedCmd: func(workspace string) spawnexec.Cmd {
 				return GradleCommand.CreateCommand(ctx, workspace, []string{"_skaffoldFailIfJibOutOfDate", "-Djib.requiredVersion=" + MinimumJibGradleVersion, ":project:_jibSkaffoldFilesV2", "-q", "--console=plain"})
 			},
 		},
@@ -314,19 +314,19 @@ func TestGetSyncMapCommandGradle(t *testing.T) {
 		description string
 		workspace   string
 		jibArtifact latest.JibArtifact
-		expectedCmd func(workspace string) exec.Cmd
+		expectedCmd func(workspace string) spawnexec.Cmd
 	}{
 		{
 			description: "single module",
 			jibArtifact: latest.JibArtifact{},
-			expectedCmd: func(workspace string) exec.Cmd {
+			expectedCmd: func(workspace string) spawnexec.Cmd {
 				return GradleCommand.CreateCommand(ctx, workspace, []string{"fake-gradleBuildArgs-for-_jibSkaffoldSyncMap-skipTests"})
 			},
 		},
 		{
 			description: "multi module",
 			jibArtifact: latest.JibArtifact{Project: "project"},
-			expectedCmd: func(workspace string) exec.Cmd {
+			expectedCmd: func(workspace string) spawnexec.Cmd {
 				return GradleCommand.CreateCommand(ctx, workspace, []string{"fake-gradleBuildArgs-for-project-for-_jibSkaffoldSyncMap-skipTests"})
 			},
 		},

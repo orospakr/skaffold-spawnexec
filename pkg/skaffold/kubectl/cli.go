@@ -19,10 +19,10 @@ package kubectl
 import (
 	"context"
 	"io"
-	"os/exec"
 	"sync"
 
 	"github.com/GoogleContainerTools/skaffold/v2/pkg/skaffold/util"
+	spawnexec "github.com/orospakr/spawnexec"
 )
 
 // CLI holds parameters to run kubectl.
@@ -57,21 +57,21 @@ func NewCLI(cfg Config, defaultNamespace string) *CLI {
 }
 
 // Command creates the underlying exec.CommandContext. This allows low-level control of the executed command.
-func (c *CLI) Command(ctx context.Context, command string, arg ...string) *exec.Cmd {
+func (c *CLI) Command(ctx context.Context, command string, arg ...string) *spawnexec.Cmd {
 	args := c.args(command, util.Ptr(""), arg...)
-	return exec.CommandContext(ctx, "kubectl", args...)
+	return spawnexec.CommandContext(ctx, "kubectl", args...)
 }
 
 // Command creates the underlying exec.CommandContext with namespace. This allows low-level control of the executed command.
-func (c *CLI) CommandWithNamespaceArg(ctx context.Context, command string, namespace string, arg ...string) *exec.Cmd {
+func (c *CLI) CommandWithNamespaceArg(ctx context.Context, command string, namespace string, arg ...string) *spawnexec.Cmd {
 	args := c.args(command, util.Ptr(namespace), arg...)
-	return exec.CommandContext(ctx, "kubectl", args...)
+	return spawnexec.CommandContext(ctx, "kubectl", args...)
 }
 
 // Command creates the underlying exec.CommandContext without a namespace. This allows low-level control of the executed command.
-func (c *CLI) CommandWithoutNamespaceArg(ctx context.Context, command string, arg ...string) *exec.Cmd {
+func (c *CLI) CommandWithoutNamespaceArg(ctx context.Context, command string, arg ...string) *spawnexec.Cmd {
 	args := c.args(command, nil, arg...)
-	return exec.CommandContext(ctx, "kubectl", args...)
+	return spawnexec.CommandContext(ctx, "kubectl", args...)
 }
 
 // Run shells out kubectl CLI.

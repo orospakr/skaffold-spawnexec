@@ -23,10 +23,10 @@ import (
 	"fmt"
 	"io"
 	"os"
-	"os/exec"
 	"sort"
 	"strings"
 	"sync"
+	spawnexec "github.com/orospakr/spawnexec"
 )
 
 type LogLine struct {
@@ -47,7 +47,7 @@ func goTest(testArgs []string) error {
 	args := append([]string{"test", "-json"}, testArgs...)
 	verbose := isVerbose(testArgs)
 
-	cmd := exec.CommandContext(context.Background(), "go", args...)
+	cmd := spawnexec.CommandContext(context.Background(), "go", args...)
 
 	pr, pw := io.Pipe()
 	cmd.Stderr = pw

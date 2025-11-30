@@ -20,7 +20,6 @@ import (
 	"bytes"
 	"context"
 	"io"
-	"os/exec"
 
 	apimachinery "k8s.io/apimachinery/pkg/runtime/schema"
 	"sigs.k8s.io/kustomize/kyaml/fn/framework"
@@ -38,6 +37,7 @@ import (
 	"github.com/GoogleContainerTools/skaffold/v2/pkg/skaffold/render/validate"
 	"github.com/GoogleContainerTools/skaffold/v2/pkg/skaffold/schema/latest"
 	"github.com/GoogleContainerTools/skaffold/v2/pkg/skaffold/util"
+	spawnexec "github.com/orospakr/spawnexec"
 )
 
 type Kpt struct {
@@ -110,7 +110,7 @@ func (r *Kpt) Render(ctx context.Context, out io.Writer, builds []graph.Artifact
 	rCtx, endTrace := instrumentation.StartTrace(ctx, "Render_kptRenderCommand")
 
 	for _, p := range r.pkgDir {
-		cmd := exec.Command("kpt", "fn", "render", p, "-o", "unwrap")
+		cmd := spawnexec.Command("kpt", "fn", "render", p, "-o", "unwrap")
 
 		if buf, err := util.RunCmdOut(rCtx, cmd); err == nil {
 			reader := kio.ByteReader{Reader: bytes.NewBuffer(buf)}

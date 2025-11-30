@@ -22,7 +22,6 @@ import (
 	"fmt"
 	"io"
 	"os"
-	"os/exec"
 	"strings"
 	"testing"
 	"time"
@@ -32,6 +31,7 @@ import (
 	"github.com/GoogleContainerTools/skaffold/v2/cmd/skaffold/app/cmd"
 	"github.com/GoogleContainerTools/skaffold/v2/pkg/skaffold/util"
 	timeutil "github.com/GoogleContainerTools/skaffold/v2/pkg/skaffold/util/time"
+	spawnexec "github.com/orospakr/spawnexec"
 )
 
 // RunBuilder is used to build a command line to run `skaffold`.
@@ -274,7 +274,7 @@ func (b *RunBuilder) Run(t *testing.T) error {
 }
 
 // StartWithProcess starts the skaffold command and returns the process id and error.
-func (b *RunBuilder) StartWithProcess(t *testing.T) (*os.Process, error) {
+func (b *RunBuilder) StartWithProcess(t *testing.T) (*spawnexec.Process, error) {
 	t.Helper()
 
 	cmd := b.cmd(context.Background())
@@ -316,7 +316,7 @@ func (b *RunBuilder) RunOrFailOutput(t *testing.T) []byte {
 	start := time.Now()
 	out, err := cmd.Output()
 	if err != nil {
-		if ee, ok := err.(*exec.ExitError); ok {
+		if ee, ok := err.(*spawnexec.ExitError); ok {
 			defer t.Error(string(ee.Stderr))
 		}
 		t.Fatalf("skaffold %s: %v, %s", b.command, err, out)
@@ -338,7 +338,7 @@ func (b *RunBuilder) RunWithStdoutAndStderrOrFail(t *testing.T, stdout, stderr i
 	start := time.Now()
 	err := cmd.Run()
 	if err != nil {
-		if ee, ok := err.(*exec.ExitError); ok {
+		if ee, ok := err.(*spawnexec.ExitError); ok {
 			defer t.Error(string(ee.Stderr))
 		}
 		t.Fatalf("skaffold %s: %v, %s", b.command, err, stderr)
@@ -347,7 +347,7 @@ func (b *RunBuilder) RunWithStdoutAndStderrOrFail(t *testing.T, stdout, stderr i
 	t.Logf("Ran %s in %v", cmd.Args, timeutil.Humanize(time.Since(start)))
 }
 
-func (b *RunBuilder) cmd(ctx context.Context) *exec.Cmd {
+func (b *RunBuilder) cmd(ctx context.Context) *spawnexec.Cmd {
 	args := []string{b.command}
 	command := b.getCobraCommand()
 
@@ -369,7 +369,7 @@ func (b *RunBuilder) cmd(ctx context.Context) *exec.Cmd {
 	if value, found := os.LookupEnv("SKAFFOLD_BINARY"); found {
 		skaffoldBinary = value
 	}
-	cmd := exec.CommandContext(ctx, skaffoldBinary, args...)
+	cmd := spawnexec.CommandContext(ctx, skaffoldBinary, args...)
 	cmd.Env = append(removeSkaffoldEnvVariables(util.OSEnviron()), b.env...)
 	if b.stdin != nil {
 		cmd.Stdin = bytes.NewReader(b.stdin)

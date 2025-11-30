@@ -20,10 +20,10 @@ import (
 	"context"
 	"fmt"
 	"io"
-	"os/exec"
 
 	"github.com/GoogleContainerTools/skaffold/v2/pkg/skaffold/output/log"
 	"github.com/GoogleContainerTools/skaffold/v2/pkg/skaffold/util"
+	spawnexec "github.com/orospakr/spawnexec"
 )
 
 type ContainerSyncer struct{}
@@ -50,16 +50,16 @@ func (s *ContainerSyncer) Sync(ctx context.Context, _ io.Writer, item *Item) err
 	return nil
 }
 
-func (s *ContainerSyncer) deleteFileFn(ctx context.Context, containerName string, files syncMap) *exec.Cmd {
+func (s *ContainerSyncer) deleteFileFn(ctx context.Context, containerName string, files syncMap) *spawnexec.Cmd {
 	var args []string
 	args = append(args, "exec", "-i", containerName, "rm", "-rf", "--")
 	for _, dsts := range files {
 		args = append(args, dsts...)
 	}
-	return exec.CommandContext(ctx, "docker", args...)
+	return spawnexec.CommandContext(ctx, "docker", args...)
 }
 
-func (s *ContainerSyncer) copyFileFn(ctx context.Context, containerName string, files syncMap) *exec.Cmd {
+func (s *ContainerSyncer) copyFileFn(ctx context.Context, containerName string, files syncMap) *spawnexec.Cmd {
 	reader, writer := io.Pipe()
 	go func() {
 		if err := util.CreateMappedTar(ctx, writer, "/", files); err != nil {
@@ -69,7 +69,7 @@ func (s *ContainerSyncer) copyFileFn(ctx context.Context, containerName string, 
 		}
 	}()
 
-	copyCmd := exec.CommandContext(ctx, "docker", "exec", "-i", containerName, "tar", "xmf", "-", "-C", "/", "--no-same-owner")
+	copyCmd := spawnexec.CommandContext(ctx, "docker", "exec", "-i", containerName, "tar", "xmf", "-", "-C", "/", "--no-same-owner")
 	copyCmd.Stdin = reader
 	return copyCmd
 }

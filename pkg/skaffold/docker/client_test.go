@@ -20,12 +20,12 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"os/exec"
 	"testing"
 
 	"github.com/GoogleContainerTools/skaffold/v2/pkg/skaffold/cluster"
 	"github.com/GoogleContainerTools/skaffold/v2/pkg/skaffold/util"
 	"github.com/GoogleContainerTools/skaffold/v2/testutil"
+	spawnexec "github.com/orospakr/spawnexec"
 )
 
 func TestNewEnvClient(t *testing.T) {
@@ -210,6 +210,6 @@ func (e *exGuestUnavailable) ExitCode() int { return 89 }
 type fakeMinikubeClient struct{}
 
 func (fakeMinikubeClient) IsMinikube(context.Context, string) bool { return false }
-func (fakeMinikubeClient) MinikubeExec(ctx context.Context, arg ...string) (*exec.Cmd, error) {
-	return exec.Command("minikube", arg...), nil
+func (fakeMinikubeClient) MinikubeExec(ctx context.Context, arg ...string) (*spawnexec.Cmd, error) {
+	return spawnexec.Command("minikube", arg...), nil
 }

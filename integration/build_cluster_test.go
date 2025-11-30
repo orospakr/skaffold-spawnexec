@@ -19,7 +19,6 @@ package integration
 import (
 	"fmt"
 	"os"
-	"os/exec"
 	"path"
 	"path/filepath"
 	"strings"
@@ -29,6 +28,7 @@ import (
 
 	"github.com/GoogleContainerTools/skaffold/v2/integration/skaffold"
 	"github.com/GoogleContainerTools/skaffold/v2/testutil"
+	spawnexec "github.com/orospakr/spawnexec"
 )
 
 // run on GCP as this test requires a load balancer
@@ -78,7 +78,7 @@ func TestBuildInCluster(t *testing.T) {
 		// copy the skaffold binary to the test case folder
 		// this is geared towards the in-docker setup: the fresh built binary is here
 		// for manual testing, we can override this temporarily
-		skaffoldSrc, err := exec.LookPath("skaffold")
+		skaffoldSrc, err := spawnexec.LookPath("skaffold")
 		t.CheckNoError(err)
 
 		t.NewTempDir().Chdir()

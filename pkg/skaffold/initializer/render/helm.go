@@ -19,7 +19,6 @@ package render
 import (
 	"context"
 	"os"
-	"os/exec"
 	"path/filepath"
 
 	"github.com/GoogleContainerTools/skaffold/v2/pkg/skaffold/initializer/analyze"
@@ -29,6 +28,7 @@ import (
 	"github.com/GoogleContainerTools/skaffold/v2/pkg/skaffold/schema/latest"
 	"github.com/GoogleContainerTools/skaffold/v2/pkg/skaffold/util"
 	"github.com/GoogleContainerTools/skaffold/v2/pkg/skaffold/yaml"
+	spawnexec "github.com/orospakr/spawnexec"
 )
 
 const (
@@ -109,7 +109,7 @@ func (h helm) GetImages() []string {
 			log.Entry(context.TODO()).Fatalf("cannot create temporary directory. Encountered error: %s", err)
 		}
 		args = append(args, "--output-dir", o)
-		cmd := exec.Command("helm", args...)
+		cmd := spawnexec.Command("helm", args...)
 		err = util.RunCmd(context.TODO(), cmd)
 		if err != nil {
 			log.Entry(context.TODO()).Warnf("could not initialize builders for helm chart %q.\nCommand %q encountered error: %s", ch.name, cmd, err)

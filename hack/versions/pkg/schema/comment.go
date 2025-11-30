@@ -23,7 +23,7 @@ import (
 	"go/printer"
 	"go/token"
 	"os"
-	"os/exec"
+	spawnexec "github.com/orospakr/spawnexec"
 )
 
 const releasedComment = `// !!! WARNING !!! This config version is already released, please DO NOT MODIFY the structs in this file.`
@@ -54,7 +54,7 @@ func UpdateVersionComment(origFile string, released bool) error {
 		return err
 	}
 
-	cmd := exec.Command("go", "fmt", origFile)
+	cmd := spawnexec.Command("go", "fmt", origFile)
 	return cmd.Run()
 }
 

@@ -21,7 +21,6 @@ import (
 	"fmt"
 	"io"
 	"os"
-	"os/exec"
 	"strconv"
 
 	"golang.org/x/sync/singleflight"
@@ -34,6 +33,7 @@ import (
 	schemautil "github.com/GoogleContainerTools/skaffold/v2/pkg/skaffold/schema/util"
 	"github.com/GoogleContainerTools/skaffold/v2/pkg/skaffold/util"
 	"github.com/GoogleContainerTools/skaffold/v2/proto/v1"
+	spawnexec "github.com/orospakr/spawnexec"
 )
 
 var (
@@ -49,7 +49,7 @@ type resourceTracker struct {
 
 type forwardedResource struct {
 	name    RunResourceName
-	cmd     *exec.Cmd
+	cmd     *spawnexec.Cmd
 	cancel  context.CancelFunc
 	started bool
 	port    int
@@ -132,7 +132,7 @@ func (r *RunAccessor) Stop() {
 }
 
 func findGcloud() bool {
-	cmd := exec.Command("gcloud", "--version")
+	cmd := spawnexec.Command("gcloud", "--version")
 	return cmd.Run() == nil
 }
 
@@ -159,7 +159,7 @@ func (r *runProxyForwarder) Start(ctx context.Context, out io.Writer) error {
 			// has not been started yet
 			cctx, cancel := context.WithCancel(ctx)
 			output.Yellow.Fprintf(out, "Forwarding service %s to local port %d\n", resource.name.String(), resource.port)
-			cmd := exec.CommandContext(cctx, "gcloud", getGcloudProxyArgs(resource.name, resource.port)...)
+			cmd := spawnexec.CommandContext(cctx, "gcloud", getGcloudProxyArgs(resource.name, resource.port)...)
 			cmd.Stdout = out
 			cmd.Stderr = out
 			resource.cancel = cancel

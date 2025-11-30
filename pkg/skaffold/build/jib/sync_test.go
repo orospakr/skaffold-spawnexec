@@ -20,7 +20,6 @@ import (
 	"context"
 	"fmt"
 	"os"
-	"os/exec"
 	"strings"
 	"testing"
 	"time"
@@ -29,6 +28,7 @@ import (
 	"github.com/GoogleContainerTools/skaffold/v2/pkg/skaffold/schema/latest"
 	"github.com/GoogleContainerTools/skaffold/v2/pkg/skaffold/util"
 	"github.com/GoogleContainerTools/skaffold/v2/testutil"
+	spawnexec "github.com/orospakr/spawnexec"
 )
 
 func TestGetSyncMapFromSystem(t *testing.T) {
@@ -120,7 +120,7 @@ func TestGetSyncMapFromSystem(t *testing.T) {
 				test.stdout,
 			))
 
-			results, err := getSyncMapFromSystem(context.Background(), &exec.Cmd{Args: []string{"ignored"}})
+			results, err := getSyncMapFromSystem(context.Background(), &spawnexec.Cmd{Args: []string{"ignored"}})
 
 			t.CheckErrorAndDeepEqual(test.shouldErr, err, test.expected, results)
 		})

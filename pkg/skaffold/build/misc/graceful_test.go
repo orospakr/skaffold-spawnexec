@@ -18,12 +18,12 @@ package misc
 
 import (
 	"context"
-	"os/exec"
 	"runtime"
 	"testing"
 	"time"
 
 	"github.com/GoogleContainerTools/skaffold/v2/testutil"
+	spawnexec "github.com/orospakr/spawnexec"
 )
 
 func TestGracefulBuildCancel(t *testing.T) {
@@ -57,7 +57,7 @@ func TestGracefulBuildCancel(t *testing.T) {
 			ctx, cancel := context.WithTimeout(context.Background(), 200*time.Millisecond)
 			defer cancel()
 
-			cmd := exec.Command("bash", "-c", test.command)
+			cmd := spawnexec.Command("bash", "-c", test.command)
 			t.CheckNoError(cmd.Start())
 
 			err := HandleGracefulTermination(ctx, cmd)

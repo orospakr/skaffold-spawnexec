@@ -19,7 +19,6 @@ package jib
 import (
 	"context"
 	"fmt"
-	"os/exec"
 	"path/filepath"
 	"testing"
 
@@ -29,6 +28,7 @@ import (
 	"github.com/GoogleContainerTools/skaffold/v2/pkg/skaffold/schema/latest"
 	"github.com/GoogleContainerTools/skaffold/v2/pkg/skaffold/util"
 	"github.com/GoogleContainerTools/skaffold/v2/testutil"
+	spawnexec "github.com/orospakr/spawnexec"
 )
 
 func TestGetDependencies(t *testing.T) {
@@ -107,7 +107,7 @@ func TestGetDependencies(t *testing.T) {
 				test.stdout,
 			))
 
-			results, err := getDependencies(context.Background(), tmpDir.Root(), exec.Cmd{Args: []string{"ignored"}, Dir: tmpDir.Root()}, &latest.JibArtifact{Project: util.RandomID()})
+			results, err := getDependencies(context.Background(), tmpDir.Root(), spawnexec.Cmd{Args: []string{"ignored"}, Dir: tmpDir.Root()}, &latest.JibArtifact{Project: util.RandomID()})
 
 			t.CheckErrorAndDeepEqual(test.shouldErr, err, test.expectedDeps, results)
 		})
@@ -125,7 +125,7 @@ func TestGetUpdatedDependencies(t *testing.T) {
 			AndRunOut("ignored", stdout),
 		)
 
-		listCmd := exec.Cmd{Args: []string{"ignored"}, Dir: tmpDir.Root()}
+		listCmd := spawnexec.Cmd{Args: []string{"ignored"}, Dir: tmpDir.Root()}
 		artifact := &latest.JibArtifact{Project: util.RandomID()}
 
 		// List dependencies

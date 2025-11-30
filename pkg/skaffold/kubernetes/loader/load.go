@@ -20,7 +20,6 @@ import (
 	"context"
 	"fmt"
 	"io"
-	"os/exec"
 	"strings"
 	"time"
 
@@ -36,6 +35,7 @@ import (
 	"github.com/GoogleContainerTools/skaffold/v2/pkg/skaffold/util"
 	"github.com/GoogleContainerTools/skaffold/v2/pkg/skaffold/util/stringslice"
 	timeutil "github.com/GoogleContainerTools/skaffold/v2/pkg/skaffold/util/time"
+	spawnexec "github.com/orospakr/spawnexec"
 )
 
 type ImageLoader struct {
@@ -117,20 +117,20 @@ func (i *ImageLoader) LoadImages(ctx context.Context, out io.Writer, localImages
 // loadImagesInKindNodes loads artifact images into every node of a kind cluster.
 func (i *ImageLoader) loadImagesInKindNodes(ctx context.Context, out io.Writer, kindCluster string, artifacts []graph.Artifact) error {
 	output.Default.Fprintln(out, "Loading images into kind cluster nodes...")
-	return i.loadImages(ctx, out, artifacts, func(tag string) *exec.Cmd {
-		return exec.CommandContext(ctx, "kind", "load", "docker-image", "--name", kindCluster, tag)
+	return i.loadImages(ctx, out, artifacts, func(tag string) *spawnexec.Cmd {
+		return spawnexec.CommandContext(ctx, "kind", "load", "docker-image", "--name", kindCluster, tag)
 	})
 }
 
 // loadImagesInK3dNodes loads artifact images into every node of a k3s cluster.
 func (i *ImageLoader) loadImagesInK3dNodes(ctx context.Context, out io.Writer, k3dCluster string, artifacts []graph.Artifact) error {
 	output.Default.Fprintln(out, "Loading images into k3d cluster nodes...")
-	return i.loadImages(ctx, out, artifacts, func(tag string) *exec.Cmd {
-		return exec.CommandContext(ctx, "k3d", "image", "import", "--cluster", k3dCluster, tag)
+	return i.loadImages(ctx, out, artifacts, func(tag string) *spawnexec.Cmd {
+		return spawnexec.CommandContext(ctx, "k3d", "image", "import", "--cluster", k3dCluster, tag)
 	})
 }
 
-func (i *ImageLoader) loadImages(ctx context.Context, out io.Writer, artifacts []graph.Artifact, createCmd func(tag string) *exec.Cmd) error {
+func (i *ImageLoader) loadImages(ctx context.Context, out io.Writer, artifacts []graph.Artifact, createCmd func(tag string) *spawnexec.Cmd) error {
 	start := time.Now()
 
 	var knownImages []string

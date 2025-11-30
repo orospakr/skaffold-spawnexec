@@ -20,7 +20,6 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"os/exec"
 	"regexp"
 	"strings"
 
@@ -34,6 +33,7 @@ import (
 	"github.com/GoogleContainerTools/skaffold/v2/pkg/diag/recommender"
 	"github.com/GoogleContainerTools/skaffold/v2/pkg/skaffold/output/log"
 	proto "github.com/GoogleContainerTools/skaffold/v2/proto/v1"
+	spawnexec "github.com/orospakr/spawnexec"
 )
 
 const (
@@ -417,7 +417,7 @@ func getPodLogs(po *v1.Pod, c string, sc proto.StatusCode) (proto.StatusCode, []
 }
 
 func executeCLI(cmdName string, args []string) ([]byte, error) {
-	cmd := exec.Command(cmdName, args...)
+	cmd := spawnexec.Command(cmdName, args...)
 	return cmd.CombinedOutput()
 }
 

@@ -23,7 +23,6 @@ import (
 	"errors"
 	"fmt"
 	"os"
-	"os/exec"
 	"path/filepath"
 	"regexp"
 	"sort"
@@ -32,6 +31,7 @@ import (
 	"time"
 
 	"github.com/google/go-containerregistry/pkg/name"
+	spawnexec "github.com/orospakr/spawnexec"
 
 	"github.com/GoogleContainerTools/skaffold/v2/pkg/skaffold/docker"
 	"github.com/GoogleContainerTools/skaffold/v2/pkg/skaffold/output/log"
@@ -150,7 +150,7 @@ func DeterminePluginType(ctx context.Context, workspace string, artifact *latest
 }
 
 // getDependencies returns a list of files to watch for changes to rebuild
-func getDependencies(ctx context.Context, workspace string, cmd exec.Cmd, a *latest.JibArtifact) ([]string, error) {
+func getDependencies(ctx context.Context, workspace string, cmd spawnexec.Cmd, a *latest.JibArtifact) ([]string, error) {
 	var dependencyList []string
 	files, ok := watchedFiles[getProjectKey(workspace, a)]
 	if !ok {
@@ -200,7 +200,7 @@ func getDependencies(ctx context.Context, workspace string, cmd exec.Cmd, a *lat
 }
 
 // refreshDependencyList calls out to Jib to update files with the latest list of files/directories to watch.
-func refreshDependencyList(ctx context.Context, files *filesLists, cmd exec.Cmd) error {
+func refreshDependencyList(ctx context.Context, files *filesLists, cmd spawnexec.Cmd) error {
 	stdout, err := util.RunCmdOut(ctx, &cmd)
 	if err != nil {
 		return fmt.Errorf("failed to get Jib dependencies: %w", err)

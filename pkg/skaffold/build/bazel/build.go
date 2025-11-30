@@ -22,11 +22,11 @@ import (
 	"fmt"
 	"io"
 	"os"
-	"os/exec"
 	"path/filepath"
 	"strings"
 
 	"github.com/google/go-containerregistry/pkg/v1/tarball"
+	spawnexec "github.com/orospakr/spawnexec"
 
 	"github.com/GoogleContainerTools/skaffold/v2/pkg/skaffold/docker"
 	"github.com/GoogleContainerTools/skaffold/v2/pkg/skaffold/output"
@@ -84,7 +84,7 @@ func (b *Builder) buildTar(ctx context.Context, out io.Writer, workspace string,
 	}
 
 	// FIXME: is it possible to apply b.skipTests?
-	cmd := exec.CommandContext(ctx, "bazel", args...)
+	cmd := spawnexec.CommandContext(ctx, "bazel", args...)
 	cmd.Dir = workspace
 	cmd.Stdout = out
 	cmd.Stderr = out
@@ -141,7 +141,7 @@ func bazelTarPath(ctx context.Context, workspace string, a *latest.BazelArtifact
 	}
 	args = append(args, a.BuildArgs...)
 
-	cmd := exec.CommandContext(ctx, "bazel", args...)
+	cmd := spawnexec.CommandContext(ctx, "bazel", args...)
 	cmd.Dir = workspace
 
 	buf, err := util.RunCmdOut(ctx, cmd)
@@ -151,7 +151,7 @@ func bazelTarPath(ctx context.Context, workspace string, a *latest.BazelArtifact
 
 	targetPath := strings.TrimSpace(string(buf))
 
-	cmd = exec.CommandContext(ctx, "bazel", "info", "execution_root")
+	cmd = spawnexec.CommandContext(ctx, "bazel", "info", "execution_root")
 	cmd.Dir = workspace
 
 	buf, err = util.RunCmdOut(ctx, cmd)

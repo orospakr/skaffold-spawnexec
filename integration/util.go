@@ -23,7 +23,6 @@ import (
 	"hash/fnv"
 	"io"
 	"os"
-	"os/exec"
 	"strconv"
 	"strings"
 	"testing"
@@ -44,6 +43,7 @@ import (
 	kubectx "github.com/GoogleContainerTools/skaffold/v2/pkg/skaffold/kubernetes/context"
 	"github.com/GoogleContainerTools/skaffold/v2/pkg/skaffold/output/log"
 	k8s "github.com/GoogleContainerTools/skaffold/v2/pkg/webhook/kubernetes"
+	spawnexec "github.com/orospakr/spawnexec"
 )
 
 type TestType int
@@ -101,7 +101,7 @@ func hash(s string) uint64 {
 }
 
 func Run(t *testing.T, dir, command string, args ...string) {
-	cmd := exec.Command(command, args...)
+	cmd := spawnexec.Command(command, args...)
 	cmd.Dir = dir
 	if output, err := cmd.Output(); err != nil {
 		t.Fatalf("running command [%s %v]: %s %v", command, args, output, err)
@@ -373,14 +373,14 @@ func (k *NSKubernetesClient) waitForDeploymentsToStabilizeWithTimeout(timeout ti
 
 // debug is used to print all the details about pods or deployments
 func (k *NSKubernetesClient) debug(entities string) {
-	cmd := exec.Command("kubectl", "-n", k.ns, "get", entities, "-oyaml")
+	cmd := spawnexec.Command("kubectl", "-n", k.ns, "get", entities, "-oyaml")
 	log.Entry(context.Background()).Warnln(cmd.Args)
 	out, _ := cmd.CombinedOutput()
 	fmt.Println(string(out)) // Use fmt.Println, not logrus, for prettier output
 }
 
 func (k *NSKubernetesClient) printDiskFreeSpace() {
-	cmd := exec.Command("df", "-h")
+	cmd := spawnexec.Command("df", "-h")
 	log.Entry(context.Background()).Warnln(cmd.Args)
 	out, _ := cmd.CombinedOutput()
 	fmt.Println(string(out))
@@ -389,7 +389,7 @@ func (k *NSKubernetesClient) printDiskFreeSpace() {
 // logs is used to print the logs of a resource
 func (k *NSKubernetesClient) logs(entity string, names []string) {
 	for _, n := range names {
-		cmd := exec.Command("kubectl", "-n", k.ns, "logs", entity+"/"+n)
+		cmd := spawnexec.Command("kubectl", "-n", k.ns, "logs", entity+"/"+n)
 		log.Entry(context.Background()).Warnln(cmd.Args)
 		out, _ := cmd.CombinedOutput()
 		fmt.Println(string(out)) // Use fmt.Println, not logrus, for prettier output

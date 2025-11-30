@@ -22,7 +22,6 @@ import (
 	"fmt"
 	"io"
 	"os"
-	"os/exec"
 	"path/filepath"
 
 	"sigs.k8s.io/kustomize/kyaml/fn/framework"
@@ -49,6 +48,7 @@ import (
 	"github.com/GoogleContainerTools/skaffold/v2/pkg/skaffold/status"
 	"github.com/GoogleContainerTools/skaffold/v2/pkg/skaffold/sync"
 	"github.com/GoogleContainerTools/skaffold/v2/pkg/skaffold/util"
+	spawnexec "github.com/orospakr/spawnexec"
 )
 
 const (
@@ -190,7 +190,7 @@ func (p processor) Process(rl *framework.ResourceList) error {
 }
 
 func (k *Deployer) getManifests(ctx context.Context) (manifest.ManifestList, error) {
-	cmd := exec.CommandContext(
+	cmd := spawnexec.CommandContext(
 		ctx, "kpt", "fn", "source", k.applyDir)
 	buf, err := util.RunCmdOut(ctx, cmd)
 	if err != nil {
@@ -226,7 +226,7 @@ func kptfileInitIfNot(ctx context.Context, out io.Writer, k *Deployer) error {
 	kptFilePath := filepath.Join(k.applyDir, kptfile.KptFileName)
 	if _, err := os.Stat(kptFilePath); os.IsNotExist(err) {
 		_, endTrace := instrumentation.StartTrace(ctx, "Deploy_InitKptfile")
-		cmd := exec.CommandContext(ctx, "kpt", "pkg", "init", k.applyDir)
+		cmd := spawnexec.CommandContext(ctx, "kpt", "pkg", "init", k.applyDir)
 		cmd.Stdout = out
 		cmd.Stderr = out
 		if err := util.RunCmd(ctx, cmd); err != nil {
@@ -266,7 +266,7 @@ func kptfileInitIfNot(ctx context.Context, out io.Writer, k *Deployer) error {
 		if k.Force {
 			args = append(args, "--force", "true")
 		}
-		cmd := exec.CommandContext(ctx, "kpt", args...)
+		cmd := spawnexec.CommandContext(ctx, "kpt", args...)
 		cmd.Stdout = out
 		cmd.Stderr = out
 		if err := util.RunCmd(ctx, cmd); err != nil {
@@ -344,7 +344,7 @@ func (k *Deployer) Deploy(ctx context.Context, out io.Writer, builds []graph.Art
 
 	args = append(args, k.Flags...)
 	args = append(args, k.ApplyFlags...)
-	cmd := exec.CommandContext(childCtx, "kpt", args...)
+	cmd := spawnexec.CommandContext(childCtx, "kpt", args...)
 	cmd.Stdout = out
 	cmd.Stderr = out
 	if err := util.RunCmd(ctx, cmd); err != nil {
@@ -384,7 +384,7 @@ func (k *Deployer) Cleanup(ctx context.Context, out io.Writer, dryRun bool, _ ma
 	}
 
 	args = append(args, k.Flags...)
-	cmd := exec.CommandContext(ctx, "kpt", args...)
+	cmd := spawnexec.CommandContext(ctx, "kpt", args...)
 	cmd.Stdout = out
 	cmd.Stderr = out
 	if err := util.RunCmd(ctx, cmd); err != nil {

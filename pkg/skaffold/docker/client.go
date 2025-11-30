@@ -22,7 +22,6 @@ import (
 	"fmt"
 	"net/http"
 	"os"
-	"os/exec"
 	"path/filepath"
 	"sort"
 	"strings"
@@ -40,6 +39,7 @@ import (
 	"github.com/GoogleContainerTools/skaffold/v2/pkg/skaffold/output/log"
 	"github.com/GoogleContainerTools/skaffold/v2/pkg/skaffold/util"
 	"github.com/GoogleContainerTools/skaffold/v2/pkg/skaffold/version"
+	spawnexec "github.com/orospakr/spawnexec"
 )
 
 // minikube 1.13.0 renumbered exit codes
@@ -118,7 +118,7 @@ func newEnvAPIClient() ([]string, client.CommonAPIClient, error) {
 	} else {
 		log.Entry(context.TODO()).Infof("DOCKER_HOST env is not set, using the host from docker context.")
 
-		command := exec.Command("docker", "context", "inspect", "--format", "{{.Endpoints.docker.Host}}")
+		command := spawnexec.Command("docker", "context", "inspect", "--format", "{{.Endpoints.docker.Host}}")
 		out, err := util.RunCmdOut(context.TODO(), command)
 		if err != nil {
 			// docker cli not installed.

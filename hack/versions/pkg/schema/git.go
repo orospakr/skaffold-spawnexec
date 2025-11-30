@@ -19,10 +19,10 @@ package schema
 import (
 	"context"
 	"fmt"
-	"os/exec"
 	"strings"
 
 	"github.com/GoogleContainerTools/skaffold/v2/pkg/skaffold/util"
+	spawnexec "github.com/orospakr/spawnexec"
 )
 
 type gitClient interface {
@@ -37,7 +37,7 @@ type git struct {
 }
 
 func newGit(baseRef string) (gitClient, error) {
-	gitPath, err := exec.LookPath("git")
+	gitPath, err := spawnexec.LookPath("git")
 	if err != nil {
 		return nil, fmt.Errorf("failed to find git on PATH: %w", err)
 	}
@@ -73,7 +73,7 @@ func (g *git) diffWithBaseline(path string) ([]byte, error) {
 }
 
 func (g *git) run(args ...string) ([]byte, error) {
-	cmd := exec.Command(g.path, args...)
+	cmd := spawnexec.Command(g.path, args...)
 	out, err := util.RunCmdOut(context.Background(), cmd)
 	if err != nil {
 		return nil, fmt.Errorf("failed running %v: %s\n%s", cmd.Args, err, string(out))

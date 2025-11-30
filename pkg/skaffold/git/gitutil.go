@@ -23,18 +23,18 @@ import (
 	"encoding/json"
 	"fmt"
 	"os"
-	"os/exec"
 	"path/filepath"
 	"strings"
 
 	"github.com/GoogleContainerTools/skaffold/v2/pkg/skaffold/config"
 	"github.com/GoogleContainerTools/skaffold/v2/pkg/skaffold/output/log"
 	"github.com/GoogleContainerTools/skaffold/v2/pkg/skaffold/util"
+	spawnexec "github.com/orospakr/spawnexec"
 )
 
 // SyncRepo syncs the target git repository with skaffold's local cache and returns the path to the repository root directory.
 var SyncRepo = syncRepo
-var findGit = func() (string, error) { return exec.LookPath("git") }
+var findGit = func() (string, error) { return spawnexec.LookPath("git") }
 
 type Config struct {
 	Repo         string
@@ -70,7 +70,7 @@ func branchExists(ctx context.Context, repoCloneURI, repo, branch string) (bool,
 	if err != nil {
 		return false, err
 	}
-	out, err := util.RunCmdOut(ctx, exec.Command(gitProgram, "ls-remote", "--heads", repoCloneURI, branch))
+	out, err := util.RunCmdOut(ctx, spawnexec.Command(gitProgram, "ls-remote", "--heads", repoCloneURI, branch))
 	if err != nil {
 		// stdErr contains the error message for os related errors, git permission errors
 		// and if repo doesn't exist
@@ -189,7 +189,7 @@ func (g *gitCmd) Run(ctx context.Context, args ...string) ([]byte, error) {
 		return nil, fmt.Errorf("no 'git' program on path: %w", err)
 	}
 
-	cmd := exec.Command(p, args...)
+	cmd := spawnexec.Command(p, args...)
 	cmd.Dir = g.Dir
 	return util.RunCmdOut(ctx, cmd)
 }

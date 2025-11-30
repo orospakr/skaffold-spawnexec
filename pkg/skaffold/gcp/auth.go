@@ -21,7 +21,6 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
-	"os/exec"
 	"sync"
 
 	"github.com/docker/cli/cli/config/configfile"
@@ -30,6 +29,7 @@ import (
 
 	"github.com/GoogleContainerTools/skaffold/v2/pkg/skaffold/output/log"
 	"github.com/GoogleContainerTools/skaffold/v2/pkg/skaffold/util"
+	spawnexec "github.com/orospakr/spawnexec"
 )
 
 var (
@@ -45,7 +45,7 @@ var gcrPrefixes = []string{"gcr.io", "us.gcr.io", "eu.gcr.io", "asia.gcr.io", "s
 // to docker's configuration.
 // This doesn't modify the ~/.docker/config.json. It's only in-memory
 func AutoConfigureGCRCredentialHelper(cf *configfile.ConfigFile) {
-	if path, _ := exec.LookPath("docker-credential-gcloud"); path == "" {
+	if path, _ := spawnexec.LookPath("docker-credential-gcloud"); path == "" {
 		log.Entry(context.TODO()).Debug("Skipping credential configuration because docker-credential-gcloud is not on PATH.")
 		return
 	}
@@ -70,7 +70,7 @@ type tokenSource struct {
 
 func (ts tokenSource) Token() (*oauth2.Token, error) {
 	// the command return a json object containing token
-	cmd := exec.Command("gcloud", "auth", "print-access-token", "--format=json")
+	cmd := spawnexec.Command("gcloud", "auth", "print-access-token", "--format=json")
 	var body bytes.Buffer
 	cmd.Stdout = &body
 	err := util.RunCmd(context.TODO(), cmd)

@@ -18,17 +18,17 @@ package kubernetes
 
 import (
 	"log"
-	"os/exec"
 
 	"github.com/google/go-github/github"
 
 	"github.com/GoogleContainerTools/skaffold/v2/pkg/webhook/labels"
+	spawnexec "github.com/orospakr/spawnexec"
 )
 
 // CleanupDeployment cleans up all deployments related to the given pull request
 func CleanupDeployment(pr *github.PullRequestEvent) error {
 	log.Printf("Cleaning up deployments for PR %d", pr.GetNumber())
 	selector := labels.Selector(pr.GetNumber())
-	cmd := exec.Command("kubectl", "delete", "all", "--selector", selector)
+	cmd := spawnexec.Command("kubectl", "delete", "all", "--selector", selector)
 	return cmd.Run()
 }

@@ -23,7 +23,6 @@ import (
 	"fmt"
 	"io"
 	"os"
-	"os/exec"
 	"path"
 	"regexp"
 	"strings"
@@ -35,6 +34,7 @@ import (
 	"github.com/GoogleContainerTools/skaffold/v2/pkg/skaffold/graph"
 	"github.com/GoogleContainerTools/skaffold/v2/pkg/skaffold/util"
 	"github.com/GoogleContainerTools/skaffold/v2/pkg/skaffold/yaml"
+	spawnexec "github.com/orospakr/spawnexec"
 )
 
 var (
@@ -82,7 +82,7 @@ type Client interface {
 func BinVer(ctx context.Context) (semver.Version, error) {
 	// Helm v2 needed the `--client` to avoid connecting to Kubernetes.
 	// Support for Helm v2 was dropped here.
-	cmd := exec.CommandContext(ctx, "helm", "version")
+	cmd := spawnexec.CommandContext(ctx, "helm", "version")
 	b, err := util.RunCmdOut(ctx, cmd)
 	if err != nil {
 		return semver.Version{}, fmt.Errorf("helm version command failed %q: %w", string(b), err)
@@ -191,7 +191,7 @@ func generateSkaffoldFilter(h Client, buildsFile string, flags []string) []strin
 	return args
 }
 
-func generateHelmCommand(ctx context.Context, h Client, useSecrets bool, env []string, args ...string) *exec.Cmd {
+func generateHelmCommand(ctx context.Context, h Client, useSecrets bool, env []string, args ...string) *spawnexec.Cmd {
 	// Only add Kubernetes parameters for subcommands that need it. The plugin system
 	// shouldn't need it.
 	wantKubernetesArgs := h != nil && (len(args) == 0 || args[0] != "plugin")
@@ -209,12 +209,12 @@ func generateHelmCommand(ctx context.Context, h Client, useSecrets bool, env []s
 		args = append([]string{"secrets"}, args...)
 	}
 
-	cmd := exec.CommandContext(ctx, "helm", args...)
+	cmd := spawnexec.CommandContext(ctx, "helm", args...)
 	cmd.Cancel = func() error {
 		fmt.Println("Terminating helm, giving it 2 minutes to clean up...")
 		return cmd.Process.Signal(os.Interrupt)
 	}
-	cmd.WaitDelay = 120 * time.Second
+	cmd.WaitDelay = int64(120 * time.Second)
 
 	if len(env) > 0 {
 		cmd.Env = env

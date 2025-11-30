@@ -21,7 +21,6 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
-	"os/exec"
 	"path/filepath"
 	"runtime"
 	"time"
@@ -32,6 +31,7 @@ import (
 	"github.com/GoogleContainerTools/skaffold/v2/pkg/skaffold/output"
 	"github.com/GoogleContainerTools/skaffold/v2/pkg/skaffold/schema/latest"
 	"github.com/GoogleContainerTools/skaffold/v2/pkg/skaffold/util"
+	spawnexec "github.com/orospakr/spawnexec"
 )
 
 var (
@@ -94,7 +94,7 @@ func (ct *Runner) runCustomTest(ctx context.Context, out io.Writer, imageTag str
 	}
 
 	if err := util.RunCmd(ctx, cmd); err != nil {
-		if e, ok := err.(*exec.ExitError); ok {
+		if e, ok := err.(*spawnexec.ExitError); ok {
 			// If the process exited by itself, just return the error
 			if e.Exited() {
 				output.Red.Fprintf(out, "Command finished with non-0 exit code.\n")
@@ -129,12 +129,12 @@ func (ct *Runner) TestDependencies(ctx context.Context) ([]string, error) {
 	if test.Dependencies != nil {
 		switch {
 		case test.Dependencies.Command != "":
-			var cmd *exec.Cmd
+			var cmd *spawnexec.Cmd
 			// We evaluate the command with a shell so that it can contain env variables.
 			if runtime.GOOS == Windows {
-				cmd = exec.CommandContext(context.Background(), "cmd.exe", "/C", test.Dependencies.Command)
+				cmd = spawnexec.CommandContext(context.Background(), "cmd.exe", "/C", test.Dependencies.Command)
 			} else {
-				cmd = exec.CommandContext(context.Background(), "sh", "-c", test.Dependencies.Command)
+				cmd = spawnexec.CommandContext(context.Background(), "sh", "-c", test.Dependencies.Command)
 			}
 
 			output, err := util.RunCmdOut(ctx, cmd)
@@ -154,14 +154,14 @@ func (ct *Runner) TestDependencies(ctx context.Context) ([]string, error) {
 	return nil, nil
 }
 
-func (ct *Runner) retrieveCmd(ctx context.Context, out io.Writer, command string, imageTag string) (*exec.Cmd, error) {
-	var cmd *exec.Cmd
+func (ct *Runner) retrieveCmd(ctx context.Context, out io.Writer, command string, imageTag string) (*spawnexec.Cmd, error) {
+	var cmd *spawnexec.Cmd
 	// We evaluate the command with a shell so that it can contain env variables.
 
 	if runtime.GOOS == Windows {
-		cmd = exec.CommandContext(ctx, "cmd.exe", "/C", command)
+		cmd = spawnexec.CommandContext(ctx, "cmd.exe", "/C", command)
 	} else {
-		cmd = exec.CommandContext(ctx, "sh", "-c", command)
+		cmd = spawnexec.CommandContext(ctx, "sh", "-c", command)
 	}
 	cmd.Stdout = out
 	cmd.Stderr = out

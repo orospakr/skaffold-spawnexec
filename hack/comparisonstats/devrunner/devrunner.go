@@ -21,7 +21,6 @@ import (
 	"context"
 	"fmt"
 	"os"
-	"os/exec"
 	"strings"
 	"time"
 
@@ -35,6 +34,7 @@ import (
 	"github.com/GoogleContainerTools/skaffold/v2/pkg/skaffold/event"
 	"github.com/GoogleContainerTools/skaffold/v2/pkg/skaffold/util"
 	v1 "github.com/GoogleContainerTools/skaffold/v2/proto/v1"
+	spawnexec "github.com/orospakr/spawnexec"
 )
 
 type DevInfo struct {
@@ -68,7 +68,7 @@ func Dev(ctx context.Context, app types.Application, skaffoldBinaryPath string, 
 		}
 		cmdArgs = append(cmdArgs, opt)
 	}
-	cmd := exec.CommandContext(ctx, skaffoldBinaryPath, cmdArgs...)
+	cmd := spawnexec.CommandContext(ctx, skaffoldBinaryPath, cmdArgs...)
 
 	cmd.Dir = app.Context
 	cmd.Stdout = buf
@@ -124,7 +124,7 @@ func kickoffDevLoop(ctx context.Context, app types.Application) error {
 	// TODO(aaron-prindle) runs are sometimes flaking, might need to slow this down? - see https://gist.github.com/aaron-prindle/23762f6a0d712c2586b10f04b1820636
 	args := strings.Split(app.Dev.Command, " ")
 	logrus.Infof("arglen: %v, Parsed args [%v]", len(args), args)
-	cmd := exec.CommandContext(ctx, "sh", "-c", app.Dev.Command)
+	cmd := spawnexec.CommandContext(ctx, "sh", "-c", app.Dev.Command)
 	cmd.Dir = app.Context
 
 	logrus.Infof("Running [%v] in %v", cmd.Args, cmd.Dir)

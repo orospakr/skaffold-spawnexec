@@ -20,7 +20,6 @@ import (
 	"bufio"
 	"context"
 	"os"
-	"os/exec"
 	"strings"
 	"testing"
 	"time"
@@ -34,6 +33,7 @@ import (
 	event "github.com/GoogleContainerTools/skaffold/v2/pkg/skaffold/event/v2"
 	"github.com/GoogleContainerTools/skaffold/v2/proto/v1"
 	V2proto "github.com/GoogleContainerTools/skaffold/v2/proto/v2"
+	spawnexec "github.com/orospakr/spawnexec"
 )
 
 // TODO: remove nolint once we've reenabled integration tests
@@ -85,7 +85,7 @@ func TestDevSync(t *testing.T) {
 			defer func() { os.Truncate("testdata/file-sync/foo", 0) }()
 
 			err := wait.PollImmediate(time.Millisecond*500, 1*time.Minute, func() (bool, error) {
-				out, _ := exec.Command("kubectl", "exec", "test-file-sync", "-n", ns.Name, "--", "cat", "foo").Output()
+				out, _ := spawnexec.Command("kubectl", "exec", "test-file-sync", "-n", ns.Name, "--", "cat", "foo").Output()
 				return string(out) == "foo", nil
 			})
 			failNowIfError(t, err)
@@ -140,7 +140,7 @@ func TestDevSyncDefaultNamespace(t *testing.T) {
 			defer func() { os.Truncate("testdata/file-sync/foo", 0) }()
 
 			err = wait.PollImmediate(time.Millisecond*500, 1*time.Minute, func() (bool, error) {
-				out, _ := exec.Command("kubectl", "exec", id, "--", "cat", "foo").Output()
+				out, _ := spawnexec.Command("kubectl", "exec", id, "--", "cat", "foo").Output()
 				return string(out) == "foo", nil
 			})
 			failNowIfError(t, err)
@@ -211,7 +211,7 @@ func TestDevAutoSync(t *testing.T) {
 			defer func() { os.Truncate(directFilePath, 0) }()
 
 			err := wait.PollImmediate(time.Millisecond*500, 1*time.Minute, func() (bool, error) {
-				out, _ := exec.Command("kubectl", "exec", "test-file-sync", "-n", ns.Name, "--", "cat", directFile).Output()
+				out, _ := spawnexec.Command("kubectl", "exec", "test-file-sync", "-n", ns.Name, "--", "cat", directFile).Output()
 				return string(out) == directFileData, nil
 			})
 			failNowIfError(t, err)
@@ -231,7 +231,7 @@ func TestDevAutoSync(t *testing.T) {
 			}
 			err = wait.PollImmediate(time.Millisecond*500, 1*time.Minute, func() (bool, error) {
 				// distroless debug only has wget, not curl
-				out, _ := exec.Command("kubectl", "exec", "test-file-sync", "-n", ns.Name, "--", "wget", "localhost:8080/", "-q", "-O", "-").Output()
+				out, _ := spawnexec.Command("kubectl", "exec", "test-file-sync", "-n", ns.Name, "--", "wget", "localhost:8080/", "-q", "-O", "-").Output()
 				return string(out) == test.uniqueStr, nil
 			})
 			failNowIfError(t, err)
@@ -327,7 +327,7 @@ func verifySyncCompletedWithEvents(t *testing.T, entries chan *proto.LogEntry, n
 	failNowIfError(t, err)
 
 	err = wait.Poll(time.Millisecond*500, 1*time.Minute, func() (bool, error) {
-		out, _ := exec.Command("kubectl", "exec", "test-file-sync", "-n", namespace, "--", "cat", "foo").Output()
+		out, _ := spawnexec.Command("kubectl", "exec", "test-file-sync", "-n", namespace, "--", "cat", "foo").Output()
 		return string(out) == fileContent, nil
 	})
 	failNowIfError(t, err)

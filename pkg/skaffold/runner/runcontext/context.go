@@ -20,7 +20,6 @@ import (
 	"context"
 	"fmt"
 	"os"
-	"os/exec"
 	"strings"
 
 	"github.com/google/uuid"
@@ -32,6 +31,7 @@ import (
 	"github.com/GoogleContainerTools/skaffold/v2/pkg/skaffold/schema/latest"
 	schemaUtil "github.com/GoogleContainerTools/skaffold/v2/pkg/skaffold/schema/util"
 	"github.com/GoogleContainerTools/skaffold/v2/pkg/skaffold/util"
+	spawnexec "github.com/orospakr/spawnexec"
 )
 
 type RunContext struct {
@@ -299,7 +299,7 @@ func (rc *RunContext) GetNamespace() string {
 
 		return defaultNamespace
 	}
-	b, err := util.RunCmdOutOnce(context.Background(), exec.Command("kubectl", "config", "view", "--minify", "-o", "jsonpath='{..namespace}'"))
+	b, err := util.RunCmdOutOnce(context.Background(), spawnexec.Command("kubectl", "config", "view", "--minify", "-o", "jsonpath='{..namespace}'"))
 	if err != nil {
 		return rc.Opts.Namespace
 	}

@@ -20,7 +20,6 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"os/exec"
 	"path/filepath"
 	"strings"
 	"testing"
@@ -39,6 +38,7 @@ import (
 	"github.com/GoogleContainerTools/skaffold/v2/pkg/skaffold/schema/latest"
 	"github.com/GoogleContainerTools/skaffold/v2/pkg/skaffold/util"
 	"github.com/GoogleContainerTools/skaffold/v2/testutil"
+	spawnexec "github.com/orospakr/spawnexec"
 )
 
 func TestNewSyncItem(t *testing.T) {
@@ -875,7 +875,7 @@ type TestCmdRecorder struct {
 	err  error
 }
 
-func (t *TestCmdRecorder) RunCmd(ctx context.Context, cmd *exec.Cmd) error {
+func (t *TestCmdRecorder) RunCmd(ctx context.Context, cmd *spawnexec.Cmd) error {
 	if t.err != nil {
 		return t.err
 	}
@@ -883,15 +883,15 @@ func (t *TestCmdRecorder) RunCmd(ctx context.Context, cmd *exec.Cmd) error {
 	return nil
 }
 
-func (t *TestCmdRecorder) RunCmdOut(ctx context.Context, cmd *exec.Cmd) ([]byte, error) {
+func (t *TestCmdRecorder) RunCmdOut(ctx context.Context, cmd *spawnexec.Cmd) ([]byte, error) {
 	return nil, t.RunCmd(ctx, cmd)
 }
 
-func (t *TestCmdRecorder) RunCmdOutOnce(ctx context.Context, cmd *exec.Cmd) ([]byte, error) {
+func (t *TestCmdRecorder) RunCmdOutOnce(ctx context.Context, cmd *spawnexec.Cmd) ([]byte, error) {
 	return nil, t.RunCmd(ctx, cmd)
 }
 
-func fakeCmd(ctx context.Context, _ v1.Pod, _ v1.Container, files syncMap) *exec.Cmd {
+func fakeCmd(ctx context.Context, _ v1.Pod, _ v1.Container, files syncMap) *spawnexec.Cmd {
 	var args []string
 
 	for src, dsts := range files {
@@ -900,7 +900,7 @@ func fakeCmd(ctx context.Context, _ v1.Pod, _ v1.Container, files syncMap) *exec
 		}
 	}
 
-	return exec.CommandContext(ctx, "copy", args...)
+	return spawnexec.CommandContext(ctx, "copy", args...)
 }
 
 var runningPod = &v1.Pod{
@@ -926,7 +926,7 @@ func TestPerform(t *testing.T) {
 		image       string
 		files       syncMap
 		pod         *v1.Pod
-		cmdFn       func(context.Context, v1.Pod, v1.Container, syncMap) *exec.Cmd
+		cmdFn       func(context.Context, v1.Pod, v1.Container, syncMap) *spawnexec.Cmd
 		cmdErr      error
 		clientErr   error
 		expected    []string

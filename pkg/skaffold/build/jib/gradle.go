@@ -20,7 +20,8 @@ import (
 	"context"
 	"fmt"
 	"io"
-	"os/exec"
+
+	spawnexec "github.com/orospakr/spawnexec"
 
 	"github.com/GoogleContainerTools/skaffold/v2/pkg/skaffold/docker"
 	"github.com/GoogleContainerTools/skaffold/v2/pkg/skaffold/output"
@@ -88,12 +89,12 @@ func getDependenciesGradle(ctx context.Context, workspace string, a *latest.JibA
 	return deps, nil
 }
 
-func getCommandGradle(ctx context.Context, workspace string, a *latest.JibArtifact) exec.Cmd {
+func getCommandGradle(ctx context.Context, workspace string, a *latest.JibArtifact) spawnexec.Cmd {
 	args := append(gradleArgsFunc(a, "_jibSkaffoldFilesV2", MinimumJibGradleVersion), "-q", "--console=plain")
 	return GradleCommand.CreateCommand(ctx, workspace, args)
 }
 
-func getSyncMapCommandGradle(ctx context.Context, workspace string, a *latest.JibArtifact) *exec.Cmd {
+func getSyncMapCommandGradle(ctx context.Context, workspace string, a *latest.JibArtifact) *spawnexec.Cmd {
 	cmd := GradleCommand.CreateCommand(ctx, workspace, gradleBuildArgsFunc("_jibSkaffoldSyncMap", a, true, false, MinimumJibMavenVersionForSync))
 	return &cmd
 }

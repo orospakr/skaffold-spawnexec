@@ -20,23 +20,23 @@ import (
 	"context"
 	"fmt"
 	"os"
-	"os/exec"
 	"reflect"
 	"unsafe"
 
 	"golang.org/x/sys/windows"
+	spawnexec "github.com/orospakr/spawnexec"
 )
 
 // Cmd represents an external command being prepared to run within a job object
 type Cmd struct {
-	*exec.Cmd
+	*spawnexec.Cmd
 	handle windows.Handle
 	ctx    context.Context
 }
 
 // CommandContext creates a new Cmd
 func CommandContext(ctx context.Context, name string, arg ...string) *Cmd {
-	return &Cmd{Cmd: exec.CommandContext(ctx, name, arg...), ctx: ctx}
+	return &Cmd{Cmd: spawnexec.CommandContext(ctx, name, arg...), ctx: ctx}
 }
 
 // Start starts the specified command in a job object but does not wait for it to complete

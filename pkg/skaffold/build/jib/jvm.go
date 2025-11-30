@@ -18,8 +18,9 @@ package jib
 
 import (
 	"context"
-	"os/exec"
 	"sync"
+
+	spawnexec "github.com/orospakr/spawnexec"
 
 	"github.com/GoogleContainerTools/skaffold/v2/pkg/skaffold/output/log"
 	"github.com/GoogleContainerTools/skaffold/v2/pkg/skaffold/util"
@@ -51,7 +52,7 @@ func resolveJVM(ctx context.Context) bool {
 	// Note that just checking for the existence of `java` is insufficient
 	// as macOS ships with /usr/bin/java that tries to hand off to a JVM
 	// installed in /Library/Java/JavaVirtualMachines
-	cmd := exec.Command("java", "-version")
+	cmd := spawnexec.Command("java", "-version")
 	err := util.RunCmd(ctx, cmd)
 	if err != nil {
 		log.Entry(context.TODO()).Warnf("Skipping Jib: no JVM: %v failed: %v", cmd.Args, err)

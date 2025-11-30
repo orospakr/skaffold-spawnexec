@@ -22,10 +22,11 @@ import (
 	"errors"
 	"fmt"
 	"os"
-	"os/exec"
 	"path/filepath"
 	"regexp"
 	"time"
+
+	spawnexec "github.com/orospakr/spawnexec"
 
 	"github.com/GoogleContainerTools/skaffold/v2/pkg/skaffold/filemon"
 	"github.com/GoogleContainerTools/skaffold/v2/pkg/skaffold/output/log"
@@ -167,7 +168,7 @@ func getSyncMap(ctx context.Context, workspace string, artifact *latest.JibArtif
 	return sm, nil
 }
 
-func getSyncMapCommand(ctx context.Context, workspace string, artifact *latest.JibArtifact) (*exec.Cmd, error) {
+func getSyncMapCommand(ctx context.Context, workspace string, artifact *latest.JibArtifact) (*spawnexec.Cmd, error) {
 	t, err := DeterminePluginType(ctx, workspace, artifact)
 	if err != nil {
 		return nil, err
@@ -183,7 +184,7 @@ func getSyncMapCommand(ctx context.Context, workspace string, artifact *latest.J
 	}
 }
 
-func getSyncMapFromSystem(ctx context.Context, cmd *exec.Cmd) (*SyncMap, error) {
+func getSyncMapFromSystem(ctx context.Context, cmd *spawnexec.Cmd) (*SyncMap, error) {
 	jsm := JSONSyncMap{}
 	stdout, err := util.RunCmdOut(ctx, cmd)
 	if err != nil {

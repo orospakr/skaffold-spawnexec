@@ -19,7 +19,6 @@ package validate
 import (
 	"context"
 	"fmt"
-	"os/exec"
 
 	sErrors "github.com/GoogleContainerTools/skaffold/v2/pkg/skaffold/errors"
 	"github.com/GoogleContainerTools/skaffold/v2/pkg/skaffold/kubernetes/manifest"
@@ -27,6 +26,7 @@ import (
 	"github.com/GoogleContainerTools/skaffold/v2/pkg/skaffold/schema/latest"
 	"github.com/GoogleContainerTools/skaffold/v2/pkg/skaffold/util"
 	"github.com/GoogleContainerTools/skaffold/v2/proto/v1"
+	spawnexec "github.com/orospakr/spawnexec"
 )
 
 var (
@@ -85,7 +85,7 @@ func (v Validator) Validate(ctx context.Context, ml manifest.ManifestList) error
 		kvs := util.EnvMapToSlice(validator.ConfigMap, "=")
 		args := []string{"fn", "eval", "-i", validator.Image, "-o", "unwrap", "-", "--"}
 		args = append(args, kvs...)
-		cmd := exec.CommandContext(ctx, "kpt", args...)
+		cmd := spawnexec.CommandContext(ctx, "kpt", args...)
 		reader := ml.Reader()
 		cmd.Stdin = reader
 		err := cmd.Run()

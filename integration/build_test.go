@@ -19,7 +19,6 @@ package integration
 import (
 	"context"
 	"os"
-	"os/exec"
 	"strings"
 	"testing"
 	"time"
@@ -38,6 +37,7 @@ import (
 	"github.com/GoogleContainerTools/skaffold/v2/pkg/skaffold/runner/runcontext"
 	"github.com/GoogleContainerTools/skaffold/v2/pkg/skaffold/util"
 	"github.com/GoogleContainerTools/skaffold/v2/testutil"
+	spawnexec "github.com/orospakr/spawnexec"
 )
 
 const imageName = "us-central1-docker.pkg.dev/k8s-skaffold/testing/simple-build:"
@@ -306,7 +306,7 @@ func setupGitRepo(t *testing.T, dir string) {
 	}
 
 	for _, args := range gitArgs {
-		cmd := exec.Command("git", args...)
+		cmd := spawnexec.Command("git", args...)
 		cmd.Dir = dir
 		if buf, err := util.RunCmdOut(context.Background(), cmd); err != nil {
 			t.Log(string(buf))
@@ -367,7 +367,7 @@ func TestRunWithDockerAndBuildArgs(t *testing.T) {
 			got := ""
 
 			err := wait.PollImmediate(time.Millisecond*500, 1*time.Minute, func() (bool, error) {
-				out, _ := exec.Command("docker", test.dockerRunArgs...).Output()
+				out, _ := spawnexec.Command("docker", test.dockerRunArgs...).Output()
 				t.Logf("Output:[%s]\n", out)
 				got = strings.Trim(string(out), " \n")
 				return got == test.wantOutput, nil

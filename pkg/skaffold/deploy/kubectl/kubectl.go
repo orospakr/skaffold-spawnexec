@@ -20,7 +20,6 @@ import (
 	"context"
 	"fmt"
 	"io"
-	"os/exec"
 	"strings"
 
 	"github.com/segmentio/textio"
@@ -50,6 +49,7 @@ import (
 	"github.com/GoogleContainerTools/skaffold/v2/pkg/skaffold/status"
 	"github.com/GoogleContainerTools/skaffold/v2/pkg/skaffold/sync"
 	"github.com/GoogleContainerTools/skaffold/v2/pkg/skaffold/util"
+	spawnexec "github.com/orospakr/spawnexec"
 )
 
 // Deployer deploys workflows using kubectl CLI.
@@ -87,7 +87,7 @@ type Deployer struct {
 // with the needed configuration for `kubectl apply`
 func NewDeployer(cfg Config, labeller *label.DefaultLabeller, d *latest.KubectlDeploy, artifacts []*latest.Artifact, configName string, customResourceSelectors []manifest.GroupKindSelector) (*Deployer, error) {
 	defaultNamespace := ""
-	b, err := util.RunCmdOutOnce(context.TODO(), exec.Command("kubectl", "config", "view", "--minify", "-o", "jsonpath='{..namespace}'"))
+	b, err := util.RunCmdOutOnce(context.TODO(), spawnexec.Command("kubectl", "config", "view", "--minify", "-o", "jsonpath='{..namespace}'"))
 	if err == nil {
 		defaultNamespace = strings.Trim(string(b), "'")
 		if defaultNamespace == "default" {

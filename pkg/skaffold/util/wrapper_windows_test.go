@@ -21,10 +21,10 @@ package util
 
 import (
 	"context"
-	"os/exec"
 	"testing"
 
 	"github.com/GoogleContainerTools/skaffold/v2/testutil"
+	spawnexec "github.com/orospakr/spawnexec"
 )
 
 func TestGetCommand(t *testing.T) {
@@ -34,7 +34,7 @@ func TestGetCommand(t *testing.T) {
 		wrapperExecutable string
 		args              []string
 		filesInWorkspace  []string
-		expectedCmd       func(workspace string) *exec.Cmd
+		expectedCmd       func(workspace string) *spawnexec.Cmd
 	}{
 		{
 			description:       "wrapper not present",
@@ -42,8 +42,8 @@ func TestGetCommand(t *testing.T) {
 			wrapperExecutable: "does-not-exist",
 			args:              []string{"arg1", "arg2"},
 			filesInWorkspace:  []string{},
-			expectedCmd: func(workspace string) *exec.Cmd {
-				cmd := exec.CommandContext(context.TODO(), "executable", "arg1", "arg2")
+			expectedCmd: func(workspace string) *spawnexec.Cmd {
+				cmd := spawnexec.CommandContext(context.TODO(), "executable", "arg1", "arg2")
 				cmd.Dir = workspace
 				return cmd
 			},
@@ -54,10 +54,10 @@ func TestGetCommand(t *testing.T) {
 			wrapperExecutable: "wrapper",
 			args:              []string{"arg1", "arg2"},
 			filesInWorkspace:  []string{"wrapper.bat"},
-			expectedCmd: func(workspace string) *exec.Cmd {
+			expectedCmd: func(workspace string) *spawnexec.Cmd {
 				wrapper, err := AbsFile(workspace, "wrapper.bat")
 				testutil.CheckError(t, false, err)
-				cmd := exec.CommandContext(context.TODO(), "cmd", "/c", wrapper, "arg1", "arg2")
+				cmd := spawnexec.CommandContext(context.TODO(), "cmd", "/c", wrapper, "arg1", "arg2")
 				cmd.Dir = workspace
 				return cmd
 			},
