@@ -1,3 +1,22 @@
+> **This is a fork of Skaffold that works around a macOS 26 hang bug.**
+>
+> On macOS 26+, Go's `fork+exec` subprocess model triggers a deadlock in the macOS
+> Network framework's `pthread_atfork` handler, causing any spawned subprocess
+> (kubectl, kustomize, helm, etc.) to spin at 100% CPU and never execute.
+> This fork replaces all `os/exec` usage with
+> [`spawnexec`](https://github.com/orospakr/spawnexec), which uses `posix_spawn`
+> instead of `fork+exec`, bypassing the bug entirely.
+>
+> Upstream issue: https://github.com/GoogleContainerTools/skaffold/issues/9925
+>
+> **Building from source:**
+> ```sh
+> brew uninstall skaffold
+> brew install go
+> make
+> cp out/skaffold ~/bin/skaffold
+> ```
+
 <!-- github does not support `width` with markdown images-->
 <img src="logo/skaffold.png" width="220">
 

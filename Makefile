@@ -57,7 +57,7 @@ endif
 GO_LDFLAGS = -X $(VERSION_PACKAGE).version=$(VERSION)
 GO_LDFLAGS += -X $(VERSION_PACKAGE).buildDate=$(BUILD_DATE)
 GO_LDFLAGS += -X $(VERSION_PACKAGE).gitCommit=$(COMMIT)
-GO_LDFLAGS += -s -w
+# GO_LDFLAGS += -s -w  # Commented out to preserve debug symbols
 
 GO_BUILD_TAGS = timetzdata
 
