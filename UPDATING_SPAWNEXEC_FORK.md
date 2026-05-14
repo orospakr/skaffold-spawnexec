@@ -20,9 +20,43 @@ https://github.com/GoogleContainerTools/skaffold/issues/9925
 
 ## What to do when merging a new upstream Skaffold release
 
-After merging or rebasing onto a new upstream tag, run the following audit and apply
-fixes as needed. All of this is mechanical work — there is no need to understand the
-business logic of the files you are patching.
+### Step 0 — Merge and resolve conflicts
+
+```bash
+git fetch origin tag vX.Y.Z
+git merge vX.Y.Z --no-commit
+```
+
+The `--no-commit` flag lets you inspect and fix conflicts before the merge is
+recorded. Expect conflicts in two categories:
+
+**`UD` conflicts (modify/delete):** upstream deleted a file that we had patched.
+Since our only change was the import swap, always accept the deletion:
+
+```bash
+git rm <file>
+```
+
+These show up as `UD` in `git status`. The deleted files in v2.17→v2.19 included
+`pkg/webhook/kubernetes/`, `vendor/github.com/sigstore/rekor/`, and
+`vendor/github.com/skratchdot/open-golang/` — the pattern will differ each release.
+
+**`UU` content conflicts:** almost always in import blocks. Two sub-patterns:
+
+*Upstream added `"os/exec"` to a file we already patched:*
+The conflict will show our side with nothing (we already replaced os/exec) and
+upstream's side with `"os/exec"` plus possibly other new imports. Take any new
+non-`os/exec` imports from upstream (e.g. `"sync"`, `"fmt"`), drop the `"os/exec"`
+line, and leave our existing spawnexec import in place. Do NOT add a second spawnexec
+import if one is already present — the build will catch it as "imported and not used".
+
+*Upstream deleted an import we added:*
+Take upstream's version; the file was already clean from upstream's perspective.
+
+**`go.sum` conflict:** take upstream's version of the conflicting lines but preserve
+the two `github.com/orospakr/spawnexec` lines that our fork adds.
+
+After resolving all conflicts, run the audit below before committing.
 
 ### Step 1 — Find every remaining `os/exec` call site
 
@@ -178,7 +212,7 @@ grep -r '"os/exec"' . --include='*.go' \
 go build ./...
 ```
 
-## Known files patched in this fork (as of Skaffold v2.17)
+## Known files patched in this fork (as of Skaffold v2.19)
 
 These were already updated by prior commits. After an upstream merge they may revert
 if upstream touched them — check them first.
@@ -221,6 +255,12 @@ if upstream touched them — check them first.
 - `vendor/github.com/google/ko/pkg/...` (multiple files)
 - `vendor/github.com/buildpacks/lifecycle/...` (multiple files)
 - `vendor/github.com/buildpacks/pack/...`
+
+**Vendor — browser opener** (replaced `skratchdot/open-golang` in v2.19):
+- `vendor/github.com/pkg/browser/browser.go`
+- `vendor/github.com/pkg/browser/browser_linux.go`
+- `vendor/github.com/pkg/browser/browser_darwin.go` (if present)
+- `vendor/github.com/pkg/browser/browser_{openbsd,freebsd,netbsd}.go`
 
 **Vendor — misc**:
 - `vendor/golang.org/x/tools/internal/gocommand/invoke.go`
