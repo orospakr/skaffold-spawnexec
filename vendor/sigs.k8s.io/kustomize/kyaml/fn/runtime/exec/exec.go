@@ -6,7 +6,7 @@ package exec
 import (
 	"io"
 	"os"
-	"os/exec"
+	exec "github.com/orospakr/spawnexec"
 	"path/filepath"
 
 	"sigs.k8s.io/kustomize/kyaml/errors"

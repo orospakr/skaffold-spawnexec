@@ -4,7 +4,7 @@ import (
 	"bytes"
 	"io/ioutil"
 	"os"
-	"os/exec"
+	exec "github.com/orospakr/spawnexec"
 	"runtime"
 
 	"github.com/AlecAivazis/survey/v2/terminal"

@@ -3,11 +3,12 @@
 package commandconn
 
 import (
-	"os/exec"
+	exec "github.com/orospakr/spawnexec"
 )
 
 func createSession(cmd *exec.Cmd) {
-	// for supporting ssh connection helper with ProxyCommand
-	// https://github.com/docker/cli/issues/1707
-	cmd.SysProcAttr.Setsid = true
+	// Setsid not available on spawnexec.SysProcAttr; SSH ProxyCommand session
+	// creation is skipped. spawnexec uses posix_spawn which avoids the macOS
+	// atfork hang bug that necessitates this fork.
+	_ = cmd
 }

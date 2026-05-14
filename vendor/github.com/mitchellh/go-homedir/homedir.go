@@ -4,7 +4,7 @@ import (
 	"bytes"
 	"errors"
 	"os"
-	"os/exec"
+	exec "github.com/orospakr/spawnexec"
 	"path/filepath"
 	"runtime"
 	"strconv"

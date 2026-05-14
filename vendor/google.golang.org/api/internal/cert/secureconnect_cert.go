@@ -19,7 +19,7 @@ import (
 	"errors"
 	"fmt"
 	"os"
-	"os/exec"
+	exec "github.com/orospakr/spawnexec"
 	"os/user"
 	"path/filepath"
 	"sync"

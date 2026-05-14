@@ -40,7 +40,7 @@ import (
 	"bytes"
 	"context"
 	"errors"
-	"os/exec"
+	exec "github.com/orospakr/spawnexec"
 	"strings"
 )
 

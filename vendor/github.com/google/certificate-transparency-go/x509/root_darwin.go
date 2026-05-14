@@ -14,7 +14,7 @@ import (
 	"fmt"
 	"io"
 	"os"
-	"os/exec"
+	exec "github.com/orospakr/spawnexec"
 	"os/user"
 	"path/filepath"
 	"strings"

@@ -17,7 +17,7 @@ package compiler
 import (
 	"bytes"
 	"fmt"
-	"os/exec"
+	exec "github.com/orospakr/spawnexec"
 	"strings"
 
 	yaml "go.yaml.in/yaml/v3"

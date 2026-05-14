@@ -20,7 +20,7 @@ import (
 	"bytes"
 	"context"
 	"io"
-	osexec "os/exec"
+	osexec "github.com/orospakr/spawnexec"
 	"sync"
 
 	"sigs.k8s.io/kind/pkg/errors"

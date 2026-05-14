@@ -15,7 +15,7 @@
 package commands
 
 import (
-	"os/exec"
+	exec "github.com/orospakr/spawnexec"
 
 	"github.com/spf13/cobra"
 )

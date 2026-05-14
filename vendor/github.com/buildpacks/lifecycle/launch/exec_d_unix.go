@@ -4,7 +4,7 @@ package launch
 
 import (
 	"os"
-	"os/exec"
+	exec "github.com/orospakr/spawnexec"
 )
 
 func setHandle(cmd *exec.Cmd, f *os.File) error {

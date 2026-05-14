@@ -4,7 +4,7 @@ import (
 	"bytes"
 	"fmt"
 	"os"
-	"os/exec"
+	exec "github.com/orospakr/spawnexec"
 	"path/filepath"
 	"syscall"
 

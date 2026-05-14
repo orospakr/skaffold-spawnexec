@@ -26,7 +26,7 @@ import (
 	"log"
 	"maps"
 	"os"
-	"os/exec"
+	exec "github.com/orospakr/spawnexec"
 	"path"
 	"path/filepath"
 	"runtime"

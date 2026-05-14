@@ -19,7 +19,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"os"
-	"os/exec"
+	exec "github.com/orospakr/spawnexec"
 	"path/filepath"
 	"regexp"
 	"runtime"

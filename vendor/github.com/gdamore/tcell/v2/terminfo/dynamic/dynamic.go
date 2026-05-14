@@ -24,7 +24,7 @@ package dynamic
 import (
 	"bytes"
 	"errors"
-	"os/exec"
+	exec "github.com/orospakr/spawnexec"
 	"regexp"
 	"strconv"
 	"strings"

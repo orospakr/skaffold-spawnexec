@@ -3,7 +3,7 @@ package launch
 import (
 	"io"
 	"os"
-	"os/exec"
+	exec "github.com/orospakr/spawnexec"
 
 	"github.com/BurntSushi/toml"
 	"github.com/pkg/errors"

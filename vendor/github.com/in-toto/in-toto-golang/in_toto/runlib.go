@@ -6,7 +6,7 @@ import (
 	"fmt"
 	"io"
 	"os"
-	"os/exec"
+	exec "github.com/orospakr/spawnexec"
 	"path/filepath"
 	"reflect"
 	"strings"

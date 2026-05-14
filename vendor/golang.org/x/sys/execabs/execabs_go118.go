@@ -6,7 +6,7 @@
 
 package execabs
 
-import "os/exec"
+import exec "github.com/orospakr/spawnexec"
 
 func isGo119ErrDot(err error) bool {
 	return false

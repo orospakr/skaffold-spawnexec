@@ -3,7 +3,7 @@ package client
 import (
 	"io"
 	"os"
-	"os/exec"
+	exec "github.com/orospakr/spawnexec"
 )
 
 // Program is an interface to execute external programs.

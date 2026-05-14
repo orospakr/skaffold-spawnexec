@@ -1,6 +1,6 @@
 package credentials
 
-import "os/exec"
+import exec "github.com/orospakr/spawnexec"
 
 // DetectDefaultStore return the default credentials store for the platform if
 // no user-defined store is passed, and the store executable is available.

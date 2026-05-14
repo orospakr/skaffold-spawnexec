@@ -24,7 +24,7 @@ import (
 	"io/ioutil"
 	"math/rand"
 	"os"
-	"os/exec"
+	exec "github.com/orospakr/spawnexec"
 	"path"
 	"path/filepath"
 	"strings"

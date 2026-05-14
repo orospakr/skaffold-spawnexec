@@ -8,13 +8,15 @@ package execabs
 
 import (
 	"errors"
-	"os/exec"
+
+	exec "github.com/orospakr/spawnexec"
 )
 
 func isGo119ErrDot(err error) bool {
 	return errors.Is(err, exec.ErrDot)
 }
 
+// spawnexec.Cmd has no Err field; fixCmd always applies its own check.
 func isGo119ErrFieldSet(cmd *exec.Cmd) bool {
-	return cmd.Err != nil
+	return false
 }

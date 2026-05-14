@@ -69,7 +69,7 @@ import (
 	"go/token"
 	"go/types"
 	"io"
-	"os/exec"
+	exec "github.com/orospakr/spawnexec"
 
 	"golang.org/x/tools/internal/gcimporter"
 )

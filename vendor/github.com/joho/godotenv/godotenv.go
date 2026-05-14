@@ -18,7 +18,7 @@ import (
 	"fmt"
 	"io"
 	"os"
-	"os/exec"
+	exec "github.com/orospakr/spawnexec"
 	"sort"
 	"strconv"
 	"strings"

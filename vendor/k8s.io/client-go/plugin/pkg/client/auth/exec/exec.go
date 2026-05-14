@@ -26,7 +26,7 @@ import (
 	"net"
 	"net/http"
 	"os"
-	"os/exec"
+	exec "github.com/orospakr/spawnexec"
 	"reflect"
 	"strings"
 	"sync"

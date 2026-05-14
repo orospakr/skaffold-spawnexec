@@ -3,7 +3,7 @@
 package open
 
 import (
-	"os/exec"
+	exec "github.com/orospakr/spawnexec"
 )
 
 func open(input string) *exec.Cmd {

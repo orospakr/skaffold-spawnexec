@@ -40,7 +40,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"os/exec"
+	exec "github.com/orospakr/spawnexec"
 	"strconv"
 	"strings"
 	"time"

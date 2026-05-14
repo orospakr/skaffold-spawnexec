@@ -27,7 +27,7 @@ import (
 	"io"
 	"net/rpc"
 	"os"
-	"os/exec"
+	exec "github.com/orospakr/spawnexec"
 
 	"github.com/googleapis/enterprise-certificate-proxy/client/util"
 )

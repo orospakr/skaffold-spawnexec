@@ -3,7 +3,7 @@
 package commandconn
 
 import (
-	"os/exec"
+	exec "github.com/orospakr/spawnexec"
 )
 
 func setPdeathsig(*exec.Cmd) {}

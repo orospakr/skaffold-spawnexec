@@ -18,7 +18,7 @@ import (
 	"errors"
 	"fmt"
 	"os"
-	"os/exec"
+	exec "github.com/orospakr/spawnexec"
 
 	"github.com/google/ko/pkg/commands/options"
 	"github.com/spf13/cobra"

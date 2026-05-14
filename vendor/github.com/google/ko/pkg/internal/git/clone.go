@@ -39,7 +39,7 @@ package git
 import (
 	"context"
 	"fmt"
-	"os/exec"
+	exec "github.com/orospakr/spawnexec"
 )
 
 // Clone the git repository from the repoURL to the specified dir.

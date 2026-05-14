@@ -4,7 +4,7 @@
 package git
 
 import (
-	"os/exec"
+	exec "github.com/orospakr/spawnexec"
 	"time"
 
 	"sigs.k8s.io/kustomize/api/internal/utils"

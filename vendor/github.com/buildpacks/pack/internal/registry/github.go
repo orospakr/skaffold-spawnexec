@@ -4,7 +4,7 @@ import (
 	"bytes"
 	"fmt"
 	"net/url"
-	"os/exec"
+	exec "github.com/orospakr/spawnexec"
 	"strings"
 	"text/template"
 

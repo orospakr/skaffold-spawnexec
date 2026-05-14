@@ -14,7 +14,7 @@ import (
 	"io"
 	"log"
 	"os"
-	"os/exec"
+	exec "github.com/orospakr/spawnexec"
 	"path/filepath"
 	"regexp"
 	"runtime"
@@ -255,7 +255,7 @@ func (i *Invocation) run(ctx context.Context, stdout, stderr io.Writer) error {
 	// soon as ctx is done. However, we also don't want to wait around forever
 	// for stderr. Give a much-longer-than-reasonable delay and then assume that
 	// something has wedged in the kernel or runtime.
-	cmd.WaitDelay = 30 * time.Second
+	cmd.WaitDelay = int64(30 * time.Second)
 
 	// The cwd gets resolved to the real path. On Darwin, where
 	// /tmp is a symlink, this breaks anything that expects the

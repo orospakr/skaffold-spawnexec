@@ -5,7 +5,7 @@
 
 package resource // import "go.opentelemetry.io/otel/sdk/resource"
 
-import "os/exec"
+import exec "github.com/orospakr/spawnexec"
 
 func execCommand(name string, arg ...string) (string, error) {
 	cmd := exec.Command(name, arg...)

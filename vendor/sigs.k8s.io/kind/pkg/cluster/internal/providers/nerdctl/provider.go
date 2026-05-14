@@ -21,7 +21,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"net"
-	osexec "os/exec"
+	osexec "github.com/orospakr/spawnexec"
 	"path/filepath"
 	"strings"
 

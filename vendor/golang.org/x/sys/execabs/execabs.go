@@ -16,10 +16,11 @@ package execabs
 import (
 	"context"
 	"fmt"
-	"os/exec"
 	"path/filepath"
 	"reflect"
 	"unsafe"
+
+	exec "github.com/orospakr/spawnexec"
 )
 
 // ErrNotFound is the error resulting if a path search failed to find an executable file.
