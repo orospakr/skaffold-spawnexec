@@ -36,7 +36,7 @@ import (
 	spawnexec "github.com/orospakr/spawnexec"
 )
 
-const GsutilExec = "gsutil"
+const GsutilExec = "gcloud"
 
 type Gsutil interface {
 	Copy(ctx context.Context, src, dst string, recursive bool) error
@@ -49,11 +49,11 @@ func NewGsutil() Gsutil {
 	return &gsutil{}
 }
 
-// Copy calls `gsutil cp [-r] <source_url> <destination_url>
+// Copy calls `gcloud storage cp [--recursive] <source_url> <destination_url>
 func (g *gsutil) Copy(ctx context.Context, src, dst string, recursive bool) error {
-	args := []string{"cp"}
+	args := []string{"storage", "cp"}
 	if recursive {
-		args = append(args, "-r")
+		args = append(args, "--recursive")
 	}
 	args = append(args, src, dst)
 	cmd := spawnexec.CommandContext(ctx, GsutilExec, args...)

@@ -1,4 +1,4 @@
-// Copyright 2025 Google LLC.
+// Copyright 2026 Google LLC.
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
@@ -540,6 +540,10 @@ func (s ArtifactResult) MarshalJSON() ([]byte, error) {
 // Artifacts: Artifacts produced by a build that should be uploaded upon
 // successful completion of all build steps.
 type Artifacts struct {
+	// GenericArtifacts: Optional. A list of generic artifacts to be uploaded to
+	// Artifact Registry upon successful completion of all build steps. If any
+	// artifacts fail to be pushed, the build is marked FAILURE.
+	GenericArtifacts []*GenericArtifact `json:"genericArtifacts,omitempty"`
 	// GoModules: Optional. A list of Go modules to be uploaded to Artifact
 	// Registry upon successful completion of all build steps. If any objects fail
 	// to be pushed, the build is marked FAILURE.
@@ -570,20 +574,26 @@ type Artifacts struct {
 	// the uploaded objects will be stored in the Build resource's results field.
 	// If any objects fail to be pushed, the build is marked FAILURE.
 	Objects *ArtifactObjects `json:"objects,omitempty"`
+	// Oci: Optional. A list of OCI images to be uploaded to Artifact Registry upon
+	// successful completion of all build steps. OCI images in the specified paths
+	// will be uploaded to the specified Artifact Registry repository using the
+	// builder service account's credentials. If any images fail to be pushed, the
+	// build is marked FAILURE.
+	Oci []*Oci `json:"oci,omitempty"`
 	// PythonPackages: A list of Python packages to be uploaded to Artifact
 	// Registry upon successful completion of all build steps. The build service
 	// account credentials will be used to perform the upload. If any objects fail
 	// to be pushed, the build is marked FAILURE.
 	PythonPackages []*PythonPackage `json:"pythonPackages,omitempty"`
-	// ForceSendFields is a list of field names (e.g. "GoModules") to
+	// ForceSendFields is a list of field names (e.g. "GenericArtifacts") to
 	// unconditionally include in API requests. By default, fields with empty or
 	// default values are omitted from API requests. See
 	// https://pkg.go.dev/google.golang.org/api#hdr-ForceSendFields for more
 	// details.
 	ForceSendFields []string `json:"-"`
-	// NullFields is a list of field names (e.g. "GoModules") to include in API
-	// requests with the JSON null value. By default, fields with empty values are
-	// omitted from API requests. See
+	// NullFields is a list of field names (e.g. "GenericArtifacts") to include in
+	// API requests with the JSON null value. By default, fields with empty values
+	// are omitted from API requests. See
 	// https://pkg.go.dev/google.golang.org/api#hdr-NullFields for more details.
 	NullFields []string `json:"-"`
 }
@@ -1279,6 +1289,7 @@ type BuildOptions struct {
 	//   "GO_MODULE_H1" - Dirhash of a Go module's source code which is then
 	// hex-encoded.
 	//   "SHA512" - Use a sha512 hash.
+	//   "DIRSUM_SHA256" - Use a dirsum_sha256 hash.
 	SourceProvenanceHash []string `json:"sourceProvenanceHash,omitempty"`
 	// SubstitutionOption: Option to specify behavior when there is an error in the
 	// substitution checks. NOTE: this is always set to ALLOW_LOOSE for triggered
@@ -1578,23 +1589,36 @@ func (s BuildTrigger) MarshalJSON() ([]byte, error) {
 
 // BuiltImage: An image built by the pipeline.
 type BuiltImage struct {
+	// ArtifactRegistryPackage: Output only. Path to the artifact in Artifact
+	// Registry.
+	ArtifactRegistryPackage string `json:"artifactRegistryPackage,omitempty"`
 	// Digest: Docker Registry 2.0 digest.
 	Digest string `json:"digest,omitempty"`
 	// Name: Name used to push the container image to Google Container Registry, as
 	// presented to `docker push`.
 	Name string `json:"name,omitempty"`
+	// OciMediaType: Output only. The OCI media type of the artifact. Non-OCI
+	// images, such as Docker images, will have an unspecified value.
+	//
+	// Possible values:
+	//   "OCI_MEDIA_TYPE_UNSPECIFIED" - Default value.
+	//   "IMAGE_MANIFEST" - The artifact is an image manifest, which represents a
+	// single image with all its layers.
+	//   "IMAGE_INDEX" - The artifact is an image index, which can contain a list
+	// of image manifests.
+	OciMediaType string `json:"ociMediaType,omitempty"`
 	// PushTiming: Output only. Stores timing information for pushing the specified
 	// image.
 	PushTiming *TimeSpan `json:"pushTiming,omitempty"`
-	// ForceSendFields is a list of field names (e.g. "Digest") to unconditionally
-	// include in API requests. By default, fields with empty or default values are
-	// omitted from API requests. See
+	// ForceSendFields is a list of field names (e.g. "ArtifactRegistryPackage") to
+	// unconditionally include in API requests. By default, fields with empty or
+	// default values are omitted from API requests. See
 	// https://pkg.go.dev/google.golang.org/api#hdr-ForceSendFields for more
 	// details.
 	ForceSendFields []string `json:"-"`
-	// NullFields is a list of field names (e.g. "Digest") to include in API
-	// requests with the JSON null value. By default, fields with empty values are
-	// omitted from API requests. See
+	// NullFields is a list of field names (e.g. "ArtifactRegistryPackage") to
+	// include in API requests with the JSON null value. By default, fields with
+	// empty values are omitted from API requests. See
 	// https://pkg.go.dev/google.golang.org/api#hdr-NullFields for more details.
 	NullFields []string `json:"-"`
 }
@@ -1839,7 +1863,7 @@ func (s CreateWorkerPoolOperationMetadata) MarshalJSON() ([]byte, error) {
 // DefaultServiceAccount: The default service account used for `Builds`.
 type DefaultServiceAccount struct {
 	// Name: Identifier. Format:
-	// `projects/{project}/locations/{location}/defaultServiceAccount
+	// `projects/{project}/locations/{location}/defaultServiceAccount`.
 	Name string `json:"name,omitempty"`
 	// ServiceAccountEmail: Output only. The email address of the service account
 	// identity that will be used for a build by default. This is returned in the
@@ -1990,6 +2014,8 @@ type Dependency struct {
 	// Empty: If set to true disable all dependency fetching (ignoring the default
 	// source as well).
 	Empty bool `json:"empty,omitempty"`
+	// GenericArtifact: Represents a generic artifact as a build dependency.
+	GenericArtifact *GenericArtifactDependency `json:"genericArtifact,omitempty"`
 	// GitSource: Represents a git repository as a build dependency.
 	GitSource *GitSourceDependency `json:"gitSource,omitempty"`
 	// ForceSendFields is a list of field names (e.g. "Empty") to unconditionally
@@ -2143,6 +2169,61 @@ type FileHashes struct {
 
 func (s FileHashes) MarshalJSON() ([]byte, error) {
 	type NoMethod FileHashes
+	return gensupport.MarshalJSON(NoMethod(s), s.ForceSendFields, s.NullFields)
+}
+
+// GenericArtifact: Generic artifact to upload to Artifact Registry upon
+// successful completion of all build steps.
+type GenericArtifact struct {
+	// Folder: Required. Path to the generic artifact in the build's workspace to
+	// be uploaded to Artifact Registry.
+	Folder string `json:"folder,omitempty"`
+	// RegistryPath: Required. Registry path to upload the generic artifact to, in
+	// the form
+	// projects/$PROJECT/locations/$LOCATION/repositories/$REPO/packages/$PACKAGE/ve
+	// rsions/$VERSION
+	RegistryPath string `json:"registryPath,omitempty"`
+	// ForceSendFields is a list of field names (e.g. "Folder") to unconditionally
+	// include in API requests. By default, fields with empty or default values are
+	// omitted from API requests. See
+	// https://pkg.go.dev/google.golang.org/api#hdr-ForceSendFields for more
+	// details.
+	ForceSendFields []string `json:"-"`
+	// NullFields is a list of field names (e.g. "Folder") to include in API
+	// requests with the JSON null value. By default, fields with empty values are
+	// omitted from API requests. See
+	// https://pkg.go.dev/google.golang.org/api#hdr-NullFields for more details.
+	NullFields []string `json:"-"`
+}
+
+func (s GenericArtifact) MarshalJSON() ([]byte, error) {
+	type NoMethod GenericArtifact
+	return gensupport.MarshalJSON(NoMethod(s), s.ForceSendFields, s.NullFields)
+}
+
+// GenericArtifactDependency: Represents a generic artifact as a build
+// dependency.
+type GenericArtifactDependency struct {
+	// DestPath: Required. Where the artifact files should be placed on the worker.
+	DestPath string `json:"destPath,omitempty"`
+	// Resource: Required. The location to download the artifact files from. Ex:
+	// projects/p1/locations/us/repositories/r1/packages/p1/versions/v1
+	Resource string `json:"resource,omitempty"`
+	// ForceSendFields is a list of field names (e.g. "DestPath") to
+	// unconditionally include in API requests. By default, fields with empty or
+	// default values are omitted from API requests. See
+	// https://pkg.go.dev/google.golang.org/api#hdr-ForceSendFields for more
+	// details.
+	ForceSendFields []string `json:"-"`
+	// NullFields is a list of field names (e.g. "DestPath") to include in API
+	// requests with the JSON null value. By default, fields with empty values are
+	// omitted from API requests. See
+	// https://pkg.go.dev/google.golang.org/api#hdr-NullFields for more details.
+	NullFields []string `json:"-"`
+}
+
+func (s GenericArtifactDependency) MarshalJSON() ([]byte, error) {
+	type NoMethod GenericArtifactDependency
 	return gensupport.MarshalJSON(NoMethod(s), s.ForceSendFields, s.NullFields)
 }
 
@@ -2784,6 +2865,7 @@ type Hash struct {
 	//   "GO_MODULE_H1" - Dirhash of a Go module's source code which is then
 	// hex-encoded.
 	//   "SHA512" - Use a sha512 hash.
+	//   "DIRSUM_SHA256" - Use a dirsum_sha256 hash.
 	Type string `json:"type,omitempty"`
 	// Value: The hash value.
 	Value string `json:"value,omitempty"`
@@ -3138,6 +3220,11 @@ type MavenArtifact struct {
 	// ArtifactId: Maven `artifactId` value used when uploading the artifact to
 	// Artifact Registry.
 	ArtifactId string `json:"artifactId,omitempty"`
+	// DeployFolder: Optional. Path to a folder containing the files to upload to
+	// Artifact Registry. This can be either an absolute path, e.g.
+	// `/workspace/my-app/target/`, or a relative path from /workspace, e.g.
+	// `my-app/target/`. This field is mutually exclusive with the `path` field.
+	DeployFolder string `json:"deployFolder,omitempty"`
 	// GroupId: Maven `groupId` value used when uploading the artifact to Artifact
 	// Registry.
 	GroupId string `json:"groupId,omitempty"`
@@ -3245,6 +3332,35 @@ type NpmPackage struct {
 
 func (s NpmPackage) MarshalJSON() ([]byte, error) {
 	type NoMethod NpmPackage
+	return gensupport.MarshalJSON(NoMethod(s), s.ForceSendFields, s.NullFields)
+}
+
+// Oci: OCI image to upload to Artifact Registry upon successful completion of
+// all build steps.
+type Oci struct {
+	// File: Required. Path on the local file system where to find the container to
+	// upload. e.g. /workspace/my-image.tar
+	File string `json:"file,omitempty"`
+	// RegistryPath: Required. Registry path to upload the container to. e.g.
+	// us-east1-docker.pkg.dev/my-project/my-repo/my-image
+	RegistryPath string `json:"registryPath,omitempty"`
+	// Tags: Optional. Tags to apply to the uploaded image. e.g. latest, 1.0.0
+	Tags []string `json:"tags,omitempty"`
+	// ForceSendFields is a list of field names (e.g. "File") to unconditionally
+	// include in API requests. By default, fields with empty or default values are
+	// omitted from API requests. See
+	// https://pkg.go.dev/google.golang.org/api#hdr-ForceSendFields for more
+	// details.
+	ForceSendFields []string `json:"-"`
+	// NullFields is a list of field names (e.g. "File") to include in API requests
+	// with the JSON null value. By default, fields with empty values are omitted
+	// from API requests. See
+	// https://pkg.go.dev/google.golang.org/api#hdr-NullFields for more details.
+	NullFields []string `json:"-"`
+}
+
+func (s Oci) MarshalJSON() ([]byte, error) {
+	type NoMethod Oci
 	return gensupport.MarshalJSON(NoMethod(s), s.ForceSendFields, s.NullFields)
 }
 
@@ -3766,6 +3882,9 @@ type Results struct {
 	// is stored. Note that the `$BUILDER_OUTPUT` variable is read-only and can't
 	// be substituted.
 	BuildStepOutputs []string `json:"buildStepOutputs,omitempty"`
+	// GenericArtifacts: Output only. Generic artifacts uploaded to Artifact
+	// Registry at the end of the build.
+	GenericArtifacts []*UploadedGenericArtifact `json:"genericArtifacts,omitempty"`
 	// GoModules: Optional. Go module artifacts uploaded to Artifact Registry at
 	// the end of the build.
 	GoModules []*UploadedGoModule `json:"goModules,omitempty"`
@@ -4294,9 +4413,46 @@ func (s UpdateWorkerPoolOperationMetadata) MarshalJSON() ([]byte, error) {
 	return gensupport.MarshalJSON(NoMethod(s), s.ForceSendFields, s.NullFields)
 }
 
+// UploadedGenericArtifact: A generic artifact uploaded to Artifact Registry
+// using the GenericArtifact directive.
+type UploadedGenericArtifact struct {
+	// ArtifactFingerprint: Output only. The hash of the whole artifact.
+	ArtifactFingerprint *FileHashes `json:"artifactFingerprint,omitempty"`
+	// ArtifactRegistryPackage: Output only. Path to the artifact in Artifact
+	// Registry.
+	ArtifactRegistryPackage string `json:"artifactRegistryPackage,omitempty"`
+	// FileHashes: Output only. The file hashes that make up the generic artifact.
+	FileHashes map[string]FileHashes `json:"fileHashes,omitempty"`
+	// PushTiming: Output only. Stores timing information for pushing the specified
+	// artifact.
+	PushTiming *TimeSpan `json:"pushTiming,omitempty"`
+	// Uri: Output only. URI of the uploaded artifact. Ex:
+	// projects/p1/locations/us/repositories/r1/packages/p1/versions/v1
+	Uri string `json:"uri,omitempty"`
+	// ForceSendFields is a list of field names (e.g. "ArtifactFingerprint") to
+	// unconditionally include in API requests. By default, fields with empty or
+	// default values are omitted from API requests. See
+	// https://pkg.go.dev/google.golang.org/api#hdr-ForceSendFields for more
+	// details.
+	ForceSendFields []string `json:"-"`
+	// NullFields is a list of field names (e.g. "ArtifactFingerprint") to include
+	// in API requests with the JSON null value. By default, fields with empty
+	// values are omitted from API requests. See
+	// https://pkg.go.dev/google.golang.org/api#hdr-NullFields for more details.
+	NullFields []string `json:"-"`
+}
+
+func (s UploadedGenericArtifact) MarshalJSON() ([]byte, error) {
+	type NoMethod UploadedGenericArtifact
+	return gensupport.MarshalJSON(NoMethod(s), s.ForceSendFields, s.NullFields)
+}
+
 // UploadedGoModule: A Go module artifact uploaded to Artifact Registry using
 // the GoModule directive.
 type UploadedGoModule struct {
+	// ArtifactRegistryPackage: Output only. Path to the artifact in Artifact
+	// Registry.
+	ArtifactRegistryPackage string `json:"artifactRegistryPackage,omitempty"`
 	// FileHashes: Hash types and values of the Go Module Artifact.
 	FileHashes *FileHashes `json:"fileHashes,omitempty"`
 	// PushTiming: Output only. Stores timing information for pushing the specified
@@ -4304,15 +4460,15 @@ type UploadedGoModule struct {
 	PushTiming *TimeSpan `json:"pushTiming,omitempty"`
 	// Uri: URI of the uploaded artifact.
 	Uri string `json:"uri,omitempty"`
-	// ForceSendFields is a list of field names (e.g. "FileHashes") to
+	// ForceSendFields is a list of field names (e.g. "ArtifactRegistryPackage") to
 	// unconditionally include in API requests. By default, fields with empty or
 	// default values are omitted from API requests. See
 	// https://pkg.go.dev/google.golang.org/api#hdr-ForceSendFields for more
 	// details.
 	ForceSendFields []string `json:"-"`
-	// NullFields is a list of field names (e.g. "FileHashes") to include in API
-	// requests with the JSON null value. By default, fields with empty values are
-	// omitted from API requests. See
+	// NullFields is a list of field names (e.g. "ArtifactRegistryPackage") to
+	// include in API requests with the JSON null value. By default, fields with
+	// empty values are omitted from API requests. See
 	// https://pkg.go.dev/google.golang.org/api#hdr-NullFields for more details.
 	NullFields []string `json:"-"`
 }
@@ -4325,6 +4481,9 @@ func (s UploadedGoModule) MarshalJSON() ([]byte, error) {
 // UploadedMavenArtifact: A Maven artifact uploaded using the MavenArtifact
 // directive.
 type UploadedMavenArtifact struct {
+	// ArtifactRegistryPackage: Output only. Path to the artifact in Artifact
+	// Registry.
+	ArtifactRegistryPackage string `json:"artifactRegistryPackage,omitempty"`
 	// FileHashes: Hash types and values of the Maven Artifact.
 	FileHashes *FileHashes `json:"fileHashes,omitempty"`
 	// PushTiming: Output only. Stores timing information for pushing the specified
@@ -4332,15 +4491,15 @@ type UploadedMavenArtifact struct {
 	PushTiming *TimeSpan `json:"pushTiming,omitempty"`
 	// Uri: URI of the uploaded artifact.
 	Uri string `json:"uri,omitempty"`
-	// ForceSendFields is a list of field names (e.g. "FileHashes") to
+	// ForceSendFields is a list of field names (e.g. "ArtifactRegistryPackage") to
 	// unconditionally include in API requests. By default, fields with empty or
 	// default values are omitted from API requests. See
 	// https://pkg.go.dev/google.golang.org/api#hdr-ForceSendFields for more
 	// details.
 	ForceSendFields []string `json:"-"`
-	// NullFields is a list of field names (e.g. "FileHashes") to include in API
-	// requests with the JSON null value. By default, fields with empty values are
-	// omitted from API requests. See
+	// NullFields is a list of field names (e.g. "ArtifactRegistryPackage") to
+	// include in API requests with the JSON null value. By default, fields with
+	// empty values are omitted from API requests. See
 	// https://pkg.go.dev/google.golang.org/api#hdr-NullFields for more details.
 	NullFields []string `json:"-"`
 }
@@ -4353,6 +4512,9 @@ func (s UploadedMavenArtifact) MarshalJSON() ([]byte, error) {
 // UploadedNpmPackage: An npm package uploaded to Artifact Registry using the
 // NpmPackage directive.
 type UploadedNpmPackage struct {
+	// ArtifactRegistryPackage: Output only. Path to the artifact in Artifact
+	// Registry.
+	ArtifactRegistryPackage string `json:"artifactRegistryPackage,omitempty"`
 	// FileHashes: Hash types and values of the npm package.
 	FileHashes *FileHashes `json:"fileHashes,omitempty"`
 	// PushTiming: Output only. Stores timing information for pushing the specified
@@ -4360,15 +4522,15 @@ type UploadedNpmPackage struct {
 	PushTiming *TimeSpan `json:"pushTiming,omitempty"`
 	// Uri: URI of the uploaded npm package.
 	Uri string `json:"uri,omitempty"`
-	// ForceSendFields is a list of field names (e.g. "FileHashes") to
+	// ForceSendFields is a list of field names (e.g. "ArtifactRegistryPackage") to
 	// unconditionally include in API requests. By default, fields with empty or
 	// default values are omitted from API requests. See
 	// https://pkg.go.dev/google.golang.org/api#hdr-ForceSendFields for more
 	// details.
 	ForceSendFields []string `json:"-"`
-	// NullFields is a list of field names (e.g. "FileHashes") to include in API
-	// requests with the JSON null value. By default, fields with empty values are
-	// omitted from API requests. See
+	// NullFields is a list of field names (e.g. "ArtifactRegistryPackage") to
+	// include in API requests with the JSON null value. By default, fields with
+	// empty values are omitted from API requests. See
 	// https://pkg.go.dev/google.golang.org/api#hdr-NullFields for more details.
 	NullFields []string `json:"-"`
 }
@@ -4380,6 +4542,9 @@ func (s UploadedNpmPackage) MarshalJSON() ([]byte, error) {
 
 // UploadedPythonPackage: Artifact uploaded using the PythonPackage directive.
 type UploadedPythonPackage struct {
+	// ArtifactRegistryPackage: Output only. Path to the artifact in Artifact
+	// Registry.
+	ArtifactRegistryPackage string `json:"artifactRegistryPackage,omitempty"`
 	// FileHashes: Hash types and values of the Python Artifact.
 	FileHashes *FileHashes `json:"fileHashes,omitempty"`
 	// PushTiming: Output only. Stores timing information for pushing the specified
@@ -4387,15 +4552,15 @@ type UploadedPythonPackage struct {
 	PushTiming *TimeSpan `json:"pushTiming,omitempty"`
 	// Uri: URI of the uploaded artifact.
 	Uri string `json:"uri,omitempty"`
-	// ForceSendFields is a list of field names (e.g. "FileHashes") to
+	// ForceSendFields is a list of field names (e.g. "ArtifactRegistryPackage") to
 	// unconditionally include in API requests. By default, fields with empty or
 	// default values are omitted from API requests. See
 	// https://pkg.go.dev/google.golang.org/api#hdr-ForceSendFields for more
 	// details.
 	ForceSendFields []string `json:"-"`
-	// NullFields is a list of field names (e.g. "FileHashes") to include in API
-	// requests with the JSON null value. By default, fields with empty values are
-	// omitted from API requests. See
+	// NullFields is a list of field names (e.g. "ArtifactRegistryPackage") to
+	// include in API requests with the JSON null value. By default, fields with
+	// empty values are omitted from API requests. See
 	// https://pkg.go.dev/google.golang.org/api#hdr-NullFields for more details.
 	NullFields []string `json:"-"`
 }

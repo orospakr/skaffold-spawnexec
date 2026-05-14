@@ -35,8 +35,8 @@ func (c *Client) CreateRepositoryCreationTemplate(ctx context.Context, params *C
 type CreateRepositoryCreationTemplateInput struct {
 
 	// A list of enumerable strings representing the Amazon ECR repository creation
-	// scenarios that this template will apply towards. The two supported scenarios are
-	// PULL_THROUGH_CACHE and REPLICATION
+	// scenarios that this template will apply towards. The supported scenarios are
+	// PULL_THROUGH_CACHE , REPLICATION , and CREATE_ON_PUSH
 	//
 	// This member is required.
 	AppliedFor []types.RCTAppliedFor
@@ -77,8 +77,8 @@ type CreateRepositoryCreationTemplateInput struct {
 	// will be immutable which will prevent them from being overwritten.
 	ImageTagMutability types.ImageTagMutability
 
-	// Creates a repository creation template with a list of filters that define which
-	// image tags can override the default image tag mutability setting.
+	// A list of filters that specify which image tags should be excluded from the
+	// repository creation template's image tag mutability setting.
 	ImageTagMutabilityExclusionFilters []types.ImageTagMutabilityExclusionFilter
 
 	// The lifecycle policy to use for repositories created using the template.
@@ -146,7 +146,7 @@ func (c *Client) addOperationCreateRepositoryCreationTemplateMiddlewares(stack *
 	if err = addComputePayloadSHA256(stack); err != nil {
 		return err
 	}
-	if err = addRetry(stack, options); err != nil {
+	if err = addRetry(stack, options, c); err != nil {
 		return err
 	}
 	if err = addRawResponseToMetadata(stack); err != nil {
@@ -168,9 +168,6 @@ func (c *Client) addOperationCreateRepositoryCreationTemplateMiddlewares(stack *
 		return err
 	}
 	if err = addSetLegacyContextSigningOptionsMiddleware(stack); err != nil {
-		return err
-	}
-	if err = addTimeOffsetBuild(stack, c); err != nil {
 		return err
 	}
 	if err = addUserAgentRetryMode(stack, options); err != nil {
@@ -206,40 +203,7 @@ func (c *Client) addOperationCreateRepositoryCreationTemplateMiddlewares(stack *
 	if err = addInterceptAttempt(stack, options); err != nil {
 		return err
 	}
-	if err = addInterceptExecution(stack, options); err != nil {
-		return err
-	}
-	if err = addInterceptBeforeSerialization(stack, options); err != nil {
-		return err
-	}
-	if err = addInterceptAfterSerialization(stack, options); err != nil {
-		return err
-	}
-	if err = addInterceptBeforeSigning(stack, options); err != nil {
-		return err
-	}
-	if err = addInterceptAfterSigning(stack, options); err != nil {
-		return err
-	}
-	if err = addInterceptTransmit(stack, options); err != nil {
-		return err
-	}
-	if err = addInterceptBeforeDeserialization(stack, options); err != nil {
-		return err
-	}
-	if err = addInterceptAfterDeserialization(stack, options); err != nil {
-		return err
-	}
-	if err = addSpanInitializeStart(stack); err != nil {
-		return err
-	}
-	if err = addSpanInitializeEnd(stack); err != nil {
-		return err
-	}
-	if err = addSpanBuildRequestStart(stack); err != nil {
-		return err
-	}
-	if err = addSpanBuildRequestEnd(stack); err != nil {
+	if err = addInterceptors(stack, options); err != nil {
 		return err
 	}
 	return nil

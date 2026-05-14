@@ -1,3 +1,6 @@
+// SPDX-FileCopyrightText: Copyright 2015-2025 go-swagger maintainers
+// SPDX-License-Identifier: Apache-2.0
+
 package client
 
 import (
@@ -95,12 +98,14 @@ func newOpenTelemetryTransport(transport runtime.ClientTransport, host string, o
 		host:      host,
 	}
 
-	defaultOpts := []OpenTelemetryOpt{
+	const baseOptions = 4
+	defaultOpts := make([]OpenTelemetryOpt, 0, len(opts)+baseOptions)
+	defaultOpts = append(defaultOpts,
 		WithSpanOptions(trace.WithSpanKind(trace.SpanKindClient)),
 		WithSpanNameFormatter(defaultTransportFormatter),
 		WithPropagators(otel.GetTextMapPropagator()),
 		WithTracerProvider(otel.GetTracerProvider()),
-	}
+	)
 
 	c := newConfig(append(defaultOpts, opts...)...)
 	tr.config = c
@@ -108,7 +113,7 @@ func newOpenTelemetryTransport(transport runtime.ClientTransport, host string, o
 	return tr
 }
 
-func (t *openTelemetryTransport) Submit(op *runtime.ClientOperation) (interface{}, error) {
+func (t *openTelemetryTransport) Submit(op *runtime.ClientOperation) (any, error) {
 	if op.Context == nil {
 		return t.transport.Submit(op)
 	}
@@ -128,7 +133,7 @@ func (t *openTelemetryTransport) Submit(op *runtime.ClientOperation) (interface{
 		return params.WriteToRequest(req, reg)
 	})
 
-	op.Reader = runtime.ClientResponseReaderFunc(func(response runtime.ClientResponse, consumer runtime.Consumer) (interface{}, error) {
+	op.Reader = runtime.ClientResponseReaderFunc(func(response runtime.ClientResponse, consumer runtime.Consumer) (any, error) {
 		if span != nil {
 			statusCode := response.Code()
 			// NOTE: this is replaced by semconv.HTTPResponseStatusCode in semconv v1.21
