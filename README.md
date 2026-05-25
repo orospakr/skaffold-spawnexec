@@ -18,7 +18,7 @@
 > cp out/skaffold ~/bin/skaffold
 > ```
 >
-> NOTE: A procedure for keeping this fork up to date can be found in [UPDATING_SPAWN_EXEC_FORK.md].
+> NOTE: A procedure for keeping this fork up to date can be found in [UPDATING_SPAWN_EXEC_FORK.md](UPDATING_SPAWN_EXEC_FORK.md).
 
 <!-- github does not support `width` with markdown images-->
 <img src="logo/skaffold.png" width="220">
