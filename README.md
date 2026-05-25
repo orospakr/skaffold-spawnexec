@@ -1,3 +1,5 @@
+## Skaffold MacOS 26 Fork Hang Bug Fork
+
 > **This is a fork of Skaffold that works around a macOS 26 hang bug.**
 >
 > On macOS 26+, Go's `fork+exec` subprocess model triggers a deadlock in the macOS
