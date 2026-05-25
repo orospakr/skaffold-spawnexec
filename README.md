@@ -5,22 +5,25 @@
 > (kubectl, kustomize, helm, etc.) to spin at 100% CPU and never execute.
 > This fork replaces all `os/exec` usage with
 > [`spawnexec`](https://github.com/orospakr/spawnexec), which uses `posix_spawn`
-> instead of `fork+exec`, bypassing the bug entirely.
+> instead of `fork+exec`, bypassing the bug entirely. This change is even done to all the vendored dependencies.
 >
-> Upstream issue: https://github.com/GoogleContainerTools/skaffold/issues/9925
+> Upstream issue: <https://github.com/GoogleContainerTools/skaffold/issues/9925>
 >
 > **Building from source:**
+>
 > ```sh
 > brew uninstall skaffold
 > brew install go
 > make
 > cp out/skaffold ~/bin/skaffold
 > ```
+>
+> NOTE: A procedure for keeping this fork up to date can be found in [[UPDATING_SPAWN_EXEC_FORK.md]]
 
 <!-- github does not support `width` with markdown images-->
 <img src="logo/skaffold.png" width="220">
 
----------------------
+---
 
 [![Code Coverage](https://codecov.io/gh/GoogleContainerTools/skaffold/branch/main/graph/badge.svg)](https://codecov.io/gh/GoogleContainerTools/skaffold)
 [![LICENSE](https://img.shields.io/github/license/GoogleContainerTools/skaffold.svg)](https://github.com/GoogleContainerTools/skaffold/blob/main/LICENSE)
@@ -32,7 +35,7 @@ locally then deploy to local or remote Kubernetes clusters. Skaffold handles
 the workflow for building, pushing and deploying your application. It also
 provides building blocks and describe customizations for a CI/CD pipeline.
 
----------------------
+---
 
 ## [Install Skaffold](https://skaffold.dev/docs/install/)
 
@@ -42,31 +45,32 @@ Or, check out our [Github Releases](https://github.com/GoogleContainerTools/skaf
 
 ## Features
 
-* Blazing fast local development
-  * **optimized source-to-deploy** - Skaffold detects changes in your source code and handles the pipeline to
-  **build**, **push**, and **deploy** your application automatically with **policy based image tagging**
-  * **continuous feedback** - Skaffold automatically aggregates logs from deployed resources and forwards container ports to your local machine
-* Project portability
-  * **share with other developers** - Skaffold is the easiest way to **share your project** with the world: `git clone` and `skaffold run`
-  * **context aware** - use Skaffold profiles, user level config, environment variables and flags to describe differences in environments
-  * **CI/CD building blocks** - use `skaffold run` end-to-end, or use individual Skaffold phases to build up your CI/CD pipeline. `skaffold render` outputs hydrated Kubernetes manifests that can be used in GitOps workflows.
-* Pluggable, declarative configuration for your project
-  * **skaffold init** - Skaffold discovers your files and generates its own config file
-  * **multi-component apps** - Skaffold supports applications consisting of multiple components
-  * **bring your own tools** - Skaffold has a pluggable architecture to integrate with any build or deploy tool
-* Lightweight
-  * **client-side only** - Skaffold has no cluster-side component, so there is no overhead or maintenance burden
-  * **minimal pipeline** - Skaffold provides an opinionated, minimal pipeline to keep things simple
+- Blazing fast local development
+  - **optimized source-to-deploy** - Skaffold detects changes in your source code and handles the pipeline to
+    **build**, **push**, and **deploy** your application automatically with **policy based image tagging**
+  - **continuous feedback** - Skaffold automatically aggregates logs from deployed resources and forwards container ports to your local machine
+- Project portability
+  - **share with other developers** - Skaffold is the easiest way to **share your project** with the world: `git clone` and `skaffold run`
+  - **context aware** - use Skaffold profiles, user level config, environment variables and flags to describe differences in environments
+  - **CI/CD building blocks** - use `skaffold run` end-to-end, or use individual Skaffold phases to build up your CI/CD pipeline. `skaffold render` outputs hydrated Kubernetes manifests that can be used in GitOps workflows.
+- Pluggable, declarative configuration for your project
+  - **skaffold init** - Skaffold discovers your files and generates its own config file
+  - **multi-component apps** - Skaffold supports applications consisting of multiple components
+  - **bring your own tools** - Skaffold has a pluggable architecture to integrate with any build or deploy tool
+- Lightweight
+  - **client-side only** - Skaffold has no cluster-side component, so there is no overhead or maintenance burden
+  - **minimal pipeline** - Skaffold provides an opinionated, minimal pipeline to keep things simple
 
-### Check out our [examples page](./examples) for more complex workflows!
+### Check out our [examples page](./examples) for more complex workflows
 
 ## IDE integrations
 
 For a managed experience of Skaffold you can install the Google `Cloud Code` extensions:
-- for [Visual Studio Code](https://cloud.google.com/code/docs/vscode/quickstart-k8s#installing)
-- for [JetBrains IDEs](https://cloud.google.com/code/docs/intellij/quickstart-k8s#installing_the_plugin). 
 
-It can manage and keep Skaffold  up-to-date while providing a more guided startup experience, along with providing and managing other common dependencies, and works with any kubernetes cluster. 
+- for [Visual Studio Code](https://cloud.google.com/code/docs/vscode/quickstart-k8s#installing)
+- for [JetBrains IDEs](https://cloud.google.com/code/docs/intellij/quickstart-k8s#installing_the_plugin).
+
+It can manage and keep Skaffold up-to-date while providing a more guided startup experience, along with providing and managing other common dependencies, and works with any kubernetes cluster.
 
 ## Contributing to Skaffold
 
@@ -74,14 +78,14 @@ We welcome any contributions from the community with open arms - Skaffold wouldn
 
 ## Community
 
-* [#skaffold on Kubernetes Slack](https://kubernetes.slack.com/messages/CABQMSZA6/)
-* [skaffold-users mailing list](https://groups.google.com/forum/#!forum/skaffold-users)
+- [#skaffold on Kubernetes Slack](https://kubernetes.slack.com/messages/CABQMSZA6/)
+- [skaffold-users mailing list](https://groups.google.com/forum/#!forum/skaffold-users)
 
-## Support 
+## Support
 
 Skaffold is generally available and considered production ready.
 Detailed feature maturity information and how we deprecate features are described in our [Deprecation Policy](https://skaffold.dev/docs/references/deprecation).
 
 ## Security Disclosures
 
-Please see our [security disclosure process](SECURITY.md).  All [security advisories](https://github.com/GoogleContainerTools/skaffold/security/advisories) are managed on Github.
+Please see our [security disclosure process](SECURITY.md). All [security advisories](https://github.com/GoogleContainerTools/skaffold/security/advisories) are managed on Github.
